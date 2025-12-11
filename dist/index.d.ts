@@ -11,6 +11,6 @@ export * from './components/index';
 export * from './hooks/index';
 export { navContributions as nav } from './nav';
 export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, type CrmContact, type CrmCompany, type CrmDeal, type CrmActivity, type CrmPersonalNote, type CrmPipelineStage, type CrmWebhookConfig, type CrmApiKey, type CrmOpenaiKey, type InsertCrmContact, type InsertCrmCompany, type InsertCrmDeal, type InsertCrmActivity, type InsertCrmPersonalNote, type InsertCrmPipelineStage, type InsertCrmWebhookConfig, type InsertCrmApiKey, type InsertCrmOpenaiKey, } from './schema/crm';
-export { parseActivityText, updateOpenaiKeyUsage } from './services/openai';
+export { parseActivityText } from './services/openai';
 export * from './services/rbac';
 //# sourceMappingURL=index.d.ts.map

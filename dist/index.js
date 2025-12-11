@@ -17,6 +17,6 @@ export { navContributions as nav } from './nav';
 // Schema exports - for projects to import into their schema
 export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, } from './schema/crm';
 // Services
-export { parseActivityText, updateOpenaiKeyUsage } from './services/openai';
+export { parseActivityText } from './services/openai';
 export * from './services/rbac';
 //# sourceMappingURL=index.js.map

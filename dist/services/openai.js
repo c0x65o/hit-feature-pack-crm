@@ -5,43 +5,19 @@
  * - activity_type (Call, Meeting, Note, Email)
  * - task_due_date (prioritized due date)
  * - task_description (derived description)
+ *
+ * Uses OPENAI_API_KEY environment variable if available.
  */
 import OpenAI from "openai";
-import { eq, and } from "drizzle-orm";
-import { crmOpenaiKeys } from "../schema/crm";
 /**
  * Parse activity text using OpenAI
  *
  * @param rawNoteText - The raw activity text to parse
- * @param options - Options including customerId, db instance, or direct API key
  * @returns Structured parse result with activity_type, task_due_date, and task_description
  */
-export async function parseActivityText(rawNoteText, options = {}) {
-    const { customerId, db, openaiApiKey } = options;
-    // Get OpenAI API key
-    let apiKey = null;
-    if (openaiApiKey) {
-        // Use provided API key directly
-        apiKey = openaiApiKey;
-    }
-    else if (customerId && db) {
-        // Retrieve customer-specific API key from database
-        const keyRecord = await db
-            .select()
-            .from(crmOpenaiKeys)
-            .where(and(eq(crmOpenaiKeys.customerId, customerId), eq(crmOpenaiKeys.isActive, true)))
-            .limit(1);
-        if (keyRecord.length > 0) {
-            // In production, decrypt the key here
-            // For now, assume keyEncrypted is stored encrypted and needs decryption
-            // This would use your encryption service (e.g., Fernet from Python integration manager)
-            apiKey = keyRecord[0].keyEncrypted; // TODO: Decrypt in production
-        }
-    }
-    // Fallback to environment variable if no customer key found
-    if (!apiKey) {
-        apiKey = process.env.OPENAI_API_KEY || null;
-    }
+export async function parseActivityText(rawNoteText) {
+    // Get OpenAI API key from environment variable
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
         // Graceful fallback - return null values if no API key available
         return {
@@ -143,24 +119,6 @@ Example response:
             taskDueDate: null,
             taskDescription: null,
         };
-    }
-}
-/**
- * Update last used timestamp for OpenAI key
- */
-export async function updateOpenaiKeyUsage(customerId, db) {
-    try {
-        await db
-            .update(crmOpenaiKeys)
-            .set({
-            lastUsedAt: new Date(),
-            lastUpdatedOnTimestamp: new Date(),
-        })
-            .where(and(eq(crmOpenaiKeys.customerId, customerId), eq(crmOpenaiKeys.isActive, true)));
-    }
-    catch (error) {
-        // Non-critical - log but don't fail
-        console.warn("Failed to update OpenAI key usage timestamp", error);
     }
 }
 //# sourceMappingURL=openai.js.map

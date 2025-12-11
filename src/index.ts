@@ -74,6 +74,6 @@ export {
 } from './schema/crm';
 
 // Services
-export { parseActivityText, updateOpenaiKeyUsage } from './services/openai';
+export { parseActivityText } from './services/openai';
 export * from './services/rbac';
 

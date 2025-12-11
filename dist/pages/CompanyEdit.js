@@ -7,7 +7,7 @@ import { AddressAutocomplete } from '../components/AddressAutocomplete';
 import { formatPhoneNumber, normalizePhoneNumber } from '../utils/phone';
 export function CompanyEdit({ id, onNavigate }) {
     const companyId = id === 'new' ? undefined : id;
-    const { Page, Card, Input, Button, Spinner, Select } = useUi();
+    const { Page, Card, Input, Button, Spinner, Select, Alert } = useUi();
     const { data: company, loading, createCompany, updateCompany } = useCrmCompanies({ id: companyId });
     const [name, setName] = useState('');
     const [website, setWebsite] = useState('');
@@ -24,6 +24,8 @@ export function CompanyEdit({ id, onNavigate }) {
     // Legacy fields (for backward compatibility)
     const [address, setAddress] = useState('');
     const [fieldErrors, setFieldErrors] = useState({});
+    const [submitError, setSubmitError] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     useEffect(() => {
         if (company) {
             setName(company.name || '');
@@ -74,8 +76,10 @@ export function CompanyEdit({ id, onNavigate }) {
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError(null);
         if (!validateForm())
             return;
+        setIsSubmitting(true);
         try {
             const data = {
                 name,
@@ -97,11 +101,21 @@ export function CompanyEdit({ id, onNavigate }) {
             }
             else {
                 const newCompany = await createCompany(data);
-                navigate(`/crm/companies/${newCompany.id}`);
+                if (newCompany && newCompany.id) {
+                    navigate(`/crm/companies/${newCompany.id}`);
+                }
+                else {
+                    throw new Error('Company created but no ID returned. Please refresh the page.');
+                }
             }
         }
-        catch {
-            // Error handled by hook
+        catch (error) {
+            console.error('Error saving company:', error);
+            const errorMessage = error?.message || error?.error || 'Failed to save company. Please try again.';
+            setSubmitError(errorMessage);
+        }
+        finally {
+            setIsSubmitting(false);
         }
     };
     // Country options (common countries)
@@ -130,7 +144,7 @@ export function CompanyEdit({ id, onNavigate }) {
     if (loading && companyId) {
         return _jsx(Spinner, {});
     }
-    return (_jsx(Page, { title: companyId ? 'Edit Company' : 'New Company', children: _jsx(Card, { children: _jsxs("form", { onSubmit: handleSubmit, className: "space-y-6", children: [_jsx(Input, { label: "Company Name", value: name, onChange: setName, required: true, error: fieldErrors.name }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [_jsx(Input, { label: "Website", value: website, onChange: setWebsite, placeholder: "https://example.com", error: fieldErrors.website }), _jsx(Input, { label: "Email", type: "email", value: companyEmail, onChange: setCompanyEmail, error: fieldErrors.companyEmail })] }), _jsxs("div", { children: [_jsx(Input, { label: "Phone", value: phoneDisplay, onChange: handlePhoneChange, placeholder: "(555) 123-4567", error: fieldErrors.companyPhone }), companyPhone && country && (_jsxs("div", { style: { fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '4px' }, children: ["Formatted: ", formatPhoneNumber(companyPhone, country)] }))] }), _jsxs("div", { className: "border-t border-gray-800 pt-6 mt-6", children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Address" }), _jsx(AddressAutocomplete, { address1: address1, address2: address2, city: city, state: state, postalCode: postalCode, country: country, onAddressChange: handleAddressChange, apiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY }), _jsx(Input, { label: "Address Line 2", value: address2, onChange: setAddress2, placeholder: "Suite, floor, etc. (optional)" }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [_jsx(Input, { label: "City", value: city, onChange: setCity }), _jsx(Input, { label: "State/Province", value: state, onChange: setState }), _jsx(Input, { label: "Postal Code", value: postalCode, onChange: setPostalCode })] }), _jsx(Select, { label: "Country", value: country, onChange: setCountry, options: countryOptions })] }), _jsx("div", { className: "flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-800", children: _jsxs(Button, { type: "submit", variant: "primary", children: [companyId ? 'Update' : 'Create', " Company"] }) })] }) }) }));
+    return (_jsx(Page, { title: companyId ? 'Edit Company' : 'New Company', children: _jsx(Card, { children: _jsxs("form", { onSubmit: handleSubmit, className: "space-y-6", children: [submitError && (_jsx(Alert, { variant: "error", title: "Error", children: submitError })), _jsx(Input, { label: "Company Name", value: name, onChange: setName, required: true, error: fieldErrors.name }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [_jsx(Input, { label: "Website", value: website, onChange: setWebsite, placeholder: "https://example.com", error: fieldErrors.website }), _jsx(Input, { label: "Email", type: "email", value: companyEmail, onChange: setCompanyEmail, error: fieldErrors.companyEmail })] }), _jsxs("div", { children: [_jsx(Input, { label: "Phone", value: phoneDisplay, onChange: handlePhoneChange, placeholder: "(555) 123-4567", error: fieldErrors.companyPhone }), companyPhone && country && (_jsxs("div", { style: { fontSize: '12px', color: 'var(--text-muted, #888)', marginTop: '4px' }, children: ["Formatted: ", formatPhoneNumber(companyPhone, country)] }))] }), _jsxs("div", { className: "border-t border-gray-800 pt-6 mt-6", children: [_jsx("h3", { className: "text-lg font-semibold mb-4", children: "Address" }), _jsx(AddressAutocomplete, { address1: address1, address2: address2, city: city, state: state, postalCode: postalCode, country: country, onAddressChange: handleAddressChange, apiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY }), _jsx(Input, { label: "Address Line 2", value: address2, onChange: setAddress2, placeholder: "Suite, floor, etc. (optional)" }), _jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [_jsx(Input, { label: "City", value: city, onChange: setCity }), _jsx(Input, { label: "State/Province", value: state, onChange: setState }), _jsx(Input, { label: "Postal Code", value: postalCode, onChange: setPostalCode })] }), _jsx(Select, { label: "Country", value: country, onChange: setCountry, options: countryOptions })] }), _jsx("div", { className: "flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-800", children: _jsxs(Button, { type: "submit", variant: "primary", disabled: isSubmitting, loading: isSubmitting, children: [companyId ? 'Update' : 'Create', " Company"] }) })] }) }) }));
 }
 export default CompanyEdit;
 //# sourceMappingURL=CompanyEdit.js.map

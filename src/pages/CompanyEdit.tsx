@@ -13,7 +13,7 @@ interface CompanyEditProps {
 
 export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
   const companyId = id === 'new' ? undefined : id;
-  const { Page, Card, Input, Button, Spinner, Select } = useUi();
+  const { Page, Card, Input, Button, Spinner, Select, Alert } = useUi();
   const { data: company, loading, createCompany, updateCompany } = useCrmCompanies({ id: companyId });
 
   const [name, setName] = useState('');
@@ -34,6 +34,8 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
   const [address, setAddress] = useState('');
   
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (company) {
@@ -96,8 +98,10 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     if (!validateForm()) return;
 
+    setIsSubmitting(true);
     try {
       const data = {
         name,
@@ -118,10 +122,18 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
         navigate(`/crm/companies/${companyId}`);
       } else {
         const newCompany = await createCompany(data);
-        navigate(`/crm/companies/${newCompany.id}`);
+        if (newCompany && newCompany.id) {
+          navigate(`/crm/companies/${newCompany.id}`);
+        } else {
+          throw new Error('Company created but no ID returned. Please refresh the page.');
+        }
       }
-    } catch {
-      // Error handled by hook
+    } catch (error: any) {
+      console.error('Error saving company:', error);
+      const errorMessage = error?.message || error?.error || 'Failed to save company. Please try again.';
+      setSubmitError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -157,6 +169,12 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
     <Page title={companyId ? 'Edit Company' : 'New Company'}>
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {submitError && (
+            <Alert variant="error" title="Error">
+              {submitError}
+            </Alert>
+          )}
+
           <Input
             label="Company Name"
             value={name}
@@ -245,7 +263,7 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-800">
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" disabled={isSubmitting} loading={isSubmitting}>
               {companyId ? 'Update' : 'Create'} Company
             </Button>
           </div>

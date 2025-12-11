@@ -15,4 +15,6 @@ export { DealList, default as DealListPage } from './DealList';
 export { DealDetail, default as DealDetailPage } from './DealDetail';
 export { DealEdit, default as DealEditPage } from './DealEdit';
 export { ActivityList, default as ActivityListPage } from './ActivityList';
+export { ActivityEdit, default as ActivityEditPage } from './ActivityEdit';
+export { PipelineStageManage, default as PipelineStageManagePage } from './PipelineStageManage';
 //# sourceMappingURL=index.d.ts.map

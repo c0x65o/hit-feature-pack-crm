@@ -49,6 +49,18 @@ routes:
   - path: /crm/activities
     page: ActivityList
     roles: []
+  - path: /crm/activities/new
+    page: ActivityEdit
+    roles: []
+  - path: /crm/activities/[id]
+    page: ActivityEdit
+    roles: []
+  - path: /crm/activities/[id]/edit
+    page: ActivityEdit
+    roles: []
+  - path: /crm/pipeline-stages
+    page: PipelineStageManage
+    roles: []
 
 # Navigation contributions - auto-added to shell sidebar
 nav:

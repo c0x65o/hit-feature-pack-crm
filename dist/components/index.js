@@ -16,4 +16,6 @@ export { PipelineMetrics } from './PipelineMetrics';
 export { OpportunitiesByStageChart } from './OpportunitiesByStageChart';
 export { LeadsByStatusChart } from './LeadsByStatusChart';
 export { AddressAutocomplete } from './AddressAutocomplete';
+export { ContactAutocomplete } from './ContactAutocomplete';
+export { DealAutocomplete } from './DealAutocomplete';
 //# sourceMappingURL=index.js.map

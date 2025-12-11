@@ -8,9 +8,19 @@ export function useCrmDeals(options = {}) {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const url = options.id
-                    ? `/api/crm/deals/${options.id}`
-                    : `/api/crm/deals?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+                let url;
+                if (options.id) {
+                    url = `/api/crm/deals/${options.id}`;
+                }
+                else {
+                    const params = new URLSearchParams();
+                    params.set('page', String(options.page || 1));
+                    params.set('pageSize', String(options.pageSize || 25));
+                    if (options.search) {
+                        params.set('search', options.search);
+                    }
+                    url = `/api/crm/deals?${params.toString()}`;
+                }
                 const res = await fetch(url);
                 if (!res.ok)
                     throw new Error('Failed to fetch deals');
@@ -25,7 +35,7 @@ export function useCrmDeals(options = {}) {
             }
         };
         fetchData();
-    }, [options.id, options.page, options.pageSize]);
+    }, [options.id, options.page, options.pageSize, options.search]);
     const createDeal = async (deal) => {
         const res = await fetch('/api/crm/deals', {
             method: 'POST',

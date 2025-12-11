@@ -7,6 +7,7 @@ interface UseCrmDealsOptions {
   page?: number;
   pageSize?: number;
   filter?: string;
+  search?: string;
 }
 
 export function useCrmDeals(options: UseCrmDealsOptions = {}) {
@@ -18,9 +19,18 @@ export function useCrmDeals(options: UseCrmDealsOptions = {}) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const url = options.id
-          ? `/api/crm/deals/${options.id}`
-          : `/api/crm/deals?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+        let url: string;
+        if (options.id) {
+          url = `/api/crm/deals/${options.id}`;
+        } else {
+          const params = new URLSearchParams();
+          params.set('page', String(options.page || 1));
+          params.set('pageSize', String(options.pageSize || 25));
+          if (options.search) {
+            params.set('search', options.search);
+          }
+          url = `/api/crm/deals?${params.toString()}`;
+        }
         const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to fetch deals');
         const json = await res.json();
@@ -33,7 +43,7 @@ export function useCrmDeals(options: UseCrmDealsOptions = {}) {
     };
 
     fetchData();
-  }, [options.id, options.page, options.pageSize]);
+  }, [options.id, options.page, options.pageSize, options.search]);
 
   const createDeal = async (deal: any) => {
     const res = await fetch('/api/crm/deals', {

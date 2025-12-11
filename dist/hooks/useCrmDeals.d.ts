@@ -3,6 +3,7 @@ interface UseCrmDealsOptions {
     page?: number;
     pageSize?: number;
     filter?: string;
+    search?: string;
 }
 export declare function useCrmDeals(options?: UseCrmDealsOptions): {
     data: any;

@@ -20,6 +20,14 @@ import { relations } from "drizzle-orm";
 export const crmCompanies = pgTable("crm_companies", {
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar("name", { length: 255 }).notNull(),
+    // Detailed address fields
+    address1: varchar("address1", { length: 255 }),
+    address2: varchar("address2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 100 }),
+    postalCode: varchar("postal_code", { length: 20 }),
+    country: varchar("country", { length: 100 }),
+    // Legacy address field (kept for backward compatibility, can be removed later)
     address: text("address"),
     website: varchar("website", { length: 255 }),
     companyPhone: varchar("company_phone", { length: 50 }),
@@ -44,6 +52,13 @@ export const crmContacts = pgTable("crm_contacts", {
     name: varchar("name", { length: 255 }).notNull(),
     title: varchar("title", { length: 100 }),
     companyId: uuid("company_id").references(() => crmCompanies.id, { onDelete: "set null" }),
+    // Detailed address fields
+    address1: varchar("address1", { length: 255 }),
+    address2: varchar("address2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 100 }),
+    postalCode: varchar("postal_code", { length: 20 }),
+    country: varchar("country", { length: 100 }),
     phone: varchar("phone", { length: 50 }),
     email: varchar("email", { length: 255 }),
     lastContactedDate: timestamp("last_contacted_date"), // Auto-updated by Activity

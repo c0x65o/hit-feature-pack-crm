@@ -1,6 +1,6 @@
 {
   "name": "@hit/feature-pack-crm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CRM feature pack with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export. Uses @hit/ui-kit for shell-agnostic UI.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -44,7 +44,8 @@
     "drizzle-orm": "^0.30.0",
     "lucide-react": "^0.460.0",
     "typescript": "^5.0.0",
-    "openai": "^4.0.0"
+    "openai": "^4.0.0",
+    "next": "^14.2.5"
   },
   "keywords": [
     "hit",

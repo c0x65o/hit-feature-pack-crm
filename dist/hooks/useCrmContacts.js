@@ -8,9 +8,22 @@ export function useCrmContacts(options = {}) {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const url = options.id
-                    ? `/api/crm/contacts/${options.id}`
-                    : `/api/crm/contacts?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+                let url;
+                if (options.id) {
+                    url = `/api/crm/contacts/${options.id}`;
+                }
+                else {
+                    const params = new URLSearchParams();
+                    params.set('page', String(options.page || 1));
+                    params.set('pageSize', String(options.pageSize || 25));
+                    if (options.search) {
+                        params.set('search', options.search);
+                    }
+                    if (options.companyId) {
+                        params.set('companyId', options.companyId);
+                    }
+                    url = `/api/crm/contacts?${params.toString()}`;
+                }
                 const res = await fetch(url);
                 if (!res.ok)
                     throw new Error('Failed to fetch contacts');
@@ -25,7 +38,7 @@ export function useCrmContacts(options = {}) {
             }
         };
         fetchData();
-    }, [options.id, options.page, options.pageSize]);
+    }, [options.id, options.page, options.pageSize, options.search, options.companyId]);
     const createContact = async (contact) => {
         const res = await fetch('/api/crm/contacts', {
             method: 'POST',

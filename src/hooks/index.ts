@@ -11,4 +11,5 @@ export { useCrmActivities } from './useCrmActivities';
 export { useCrmPersonalNotes } from './useCrmPersonalNotes';
 export { useCrmPipelineStages } from './useCrmPipelineStages';
 export { useGlobalSearch } from './useGlobalSearch';
+export { useCrmMetrics } from './useCrmMetrics';
 

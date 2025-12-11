@@ -3,6 +3,7 @@ interface UseCrmContactsOptions {
     page?: number;
     pageSize?: number;
     search?: string;
+    companyId?: string;
 }
 export declare function useCrmContacts(options?: UseCrmContactsOptions): {
     data: any;

@@ -7,6 +7,7 @@ interface UseCrmContactsOptions {
   page?: number;
   pageSize?: number;
   search?: string;
+  companyId?: string;
 }
 
 export function useCrmContacts(options: UseCrmContactsOptions = {}) {
@@ -18,9 +19,21 @@ export function useCrmContacts(options: UseCrmContactsOptions = {}) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const url = options.id
-          ? `/api/crm/contacts/${options.id}`
-          : `/api/crm/contacts?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+        let url: string;
+        if (options.id) {
+          url = `/api/crm/contacts/${options.id}`;
+        } else {
+          const params = new URLSearchParams();
+          params.set('page', String(options.page || 1));
+          params.set('pageSize', String(options.pageSize || 25));
+          if (options.search) {
+            params.set('search', options.search);
+          }
+          if (options.companyId) {
+            params.set('companyId', options.companyId);
+          }
+          url = `/api/crm/contacts?${params.toString()}`;
+        }
         const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to fetch contacts');
         const json = await res.json();
@@ -33,7 +46,7 @@ export function useCrmContacts(options: UseCrmContactsOptions = {}) {
     };
 
     fetchData();
-  }, [options.id, options.page, options.pageSize]);
+  }, [options.id, options.page, options.pageSize, options.search, options.companyId]);
 
   const createContact = async (contact: any) => {
     const res = await fetch('/api/crm/contacts', {
@@ -41,7 +54,11 @@ export function useCrmContacts(options: UseCrmContactsOptions = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contact),
     });
-    if (!res.ok) throw new Error('Failed to create contact');
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || `Failed to create contact (${res.status})`;
+      throw new Error(errorMessage);
+    }
     return res.json();
   };
 
@@ -51,7 +68,11 @@ export function useCrmContacts(options: UseCrmContactsOptions = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(contact),
     });
-    if (!res.ok) throw new Error('Failed to update contact');
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || `Failed to update contact (${res.status})`;
+      throw new Error(errorMessage);
+    }
     return res.json();
   };
 

@@ -76,4 +76,5 @@ export {
 // Services
 export { parseActivityText } from './services/openai';
 export * from './services/rbac';
+export * from './services/webhooks';
 

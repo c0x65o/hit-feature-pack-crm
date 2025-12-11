@@ -7,6 +7,7 @@
  * - task_description (derived description)
  *
  * Uses OPENAI_API_KEY environment variable if available.
+ * Uses dynamic import to avoid bundling openai package when not needed.
  */
 export interface ActivityParseResult {
     activityType: "Call" | "Meeting" | "Note" | "Email" | null;

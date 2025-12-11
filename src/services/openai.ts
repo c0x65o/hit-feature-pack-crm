@@ -7,9 +7,8 @@
  * - task_description (derived description)
  * 
  * Uses OPENAI_API_KEY environment variable if available.
+ * Uses dynamic import to avoid bundling openai package when not needed.
  */
-
-import OpenAI from "openai";
 
 export interface ActivityParseResult {
   activityType: "Call" | "Meeting" | "Note" | "Email" | null;
@@ -31,6 +30,21 @@ export async function parseActivityText(
 
   if (!apiKey) {
     // Graceful fallback - return null values if no API key available
+    return {
+      activityType: null,
+      taskDueDate: null,
+      taskDescription: null,
+    };
+  }
+
+  // Dynamically import OpenAI to avoid bundling when not needed
+  let OpenAI: any;
+  try {
+    const openaiModule = await import("openai");
+    OpenAI = openaiModule.default;
+  } catch (importError) {
+    // Graceful fallback if openai package is not installed
+    console.warn("OpenAI package not installed. Install with: npm install openai");
     return {
       activityType: null,
       taskDueDate: null,

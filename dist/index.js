@@ -19,4 +19,5 @@ export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, c
 // Services
 export { parseActivityText } from './services/openai';
 export * from './services/rbac';
+export * from './services/webhooks';
 //# sourceMappingURL=index.js.map

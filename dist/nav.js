@@ -38,6 +38,12 @@ export const navContributions = [
                 path: '/crm/activities',
                 icon: 'Activity',
             },
+            {
+                id: 'crm-pipeline-stages',
+                label: 'Pipeline Stages',
+                path: '/crm/pipeline-stages',
+                icon: 'Workflow',
+            },
         ],
     },
 ];

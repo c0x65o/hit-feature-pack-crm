@@ -31,6 +31,10 @@ export {
   DealEditPage,
   ActivityList,
   ActivityListPage,
+  ActivityEdit,
+  ActivityEditPage,
+  PipelineStageManage,
+  PipelineStageManagePage,
 } from './pages/index';
 
 // Components - exported individually for tree-shaking

@@ -64,82 +64,84 @@ export function PipelineStageManage({ onNavigate }: { onNavigate?: (path: string
   }
 
   return (
-    <Page title="Pipeline Stages">
+    <Page 
+      title="Pipeline Stages"
+      description="Configure the stages your deals move through from initial contact to close"
+      actions={
+        stages.length === 0 ? (
+          <Button
+            variant="primary"
+            onClick={initializeStages}
+            disabled={initializing}
+          >
+            {initializing ? 'Initializing...' : 'Initialize Default Stages'}
+          </Button>
+        ) : undefined
+      }
+    >
       <Card>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-white">Sales Pipeline Stages</h2>
-              <p className="text-sm text-gray-400 mt-1">
-                Pipeline stages define the steps a deal goes through from initial contact to close.
-              </p>
-            </div>
-            {stages.length === 0 && (
-              <Button
-                variant="primary"
-                onClick={initializeStages}
-                disabled={initializing}
-              >
-                {initializing ? 'Initializing...' : 'Initialize Default Stages'}
-              </Button>
-            )}
+        {stages.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="mb-4" style={{ color: 'var(--hit-foreground)' }}>
+              No pipeline stages configured yet.
+            </p>
+            <p className="text-sm mb-6" style={{ color: 'var(--hit-muted-foreground)' }}>
+              Click "Initialize Default Stages" to create the standard sales pipeline:
+              <br />
+              <span className="font-medium">Lead → Qualified → Proposal → Negotiation → Closed Won / Closed Lost</span>
+            </p>
+            <Button
+              variant="primary"
+              onClick={initializeStages}
+              disabled={initializing}
+            >
+              {initializing ? 'Initializing...' : 'Initialize Default Stages'}
+            </Button>
           </div>
-
-          {stages.length === 0 ? (
-            <div className="text-center py-12 border border-gray-700 rounded-lg bg-gray-800/50">
-              <p className="text-gray-400 mb-4">No pipeline stages configured yet.</p>
-              <p className="text-sm text-gray-500 mb-6">
-                Click "Initialize Default Stages" to create the standard sales pipeline:
-                <br />
-                Lead → Qualified → Proposal → Negotiation → Closed Won / Closed Lost
-              </p>
-              <Button
-                variant="primary"
-                onClick={initializeStages}
-                disabled={initializing}
-              >
-                {initializing ? 'Initializing...' : 'Initialize Default Stages'}
-              </Button>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-5 gap-4 text-sm font-medium pb-3 border-b" style={{ borderColor: 'var(--hit-border)', color: 'var(--hit-muted-foreground)' }}>
+              <div>Order</div>
+              <div>Stage Name</div>
+              <div>Status</div>
+              <div>Closed Won</div>
+              <div>Closed Lost</div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="grid grid-cols-5 gap-4 text-sm font-medium text-gray-400 pb-2 border-b border-gray-700">
-                <div>Order</div>
-                <div>Stage Name</div>
-                <div>Status</div>
-                <div>Closed Won</div>
-                <div>Closed Lost</div>
-              </div>
+            <div className="space-y-2">
               {stages
                 .sort((a, b) => a.order - b.order)
                 .map((stage) => (
                   <div
                     key={stage.id}
-                    className="grid grid-cols-5 gap-4 py-3 px-4 bg-gray-800/50 rounded-lg border border-gray-700"
+                    className="grid grid-cols-5 gap-4 py-3 px-4 rounded-lg border"
+                    style={{ 
+                      backgroundColor: 'var(--hit-muted)',
+                      borderColor: 'var(--hit-border)'
+                    }}
                   >
-                    <div className="text-white">{stage.order}</div>
-                    <div className="text-white font-medium">{stage.name}</div>
-                    <div className="text-gray-400">
+                    <div style={{ color: 'var(--hit-foreground)' }}>{stage.order}</div>
+                    <div className="font-medium" style={{ color: 'var(--hit-foreground)' }}>{stage.name}</div>
+                    <div style={{ color: 'var(--hit-muted-foreground)' }}>
                       {stage.isClosedWon || stage.isClosedLost ? 'Final' : 'Active'}
                     </div>
-                    <div className="text-gray-400">
+                    <div style={{ color: 'var(--hit-muted-foreground)' }}>
                       {stage.isClosedWon ? '✓' : '—'}
                     </div>
-                    <div className="text-gray-400">
+                    <div style={{ color: 'var(--hit-muted-foreground)' }}>
                       {stage.isClosedLost ? '✓' : '—'}
                     </div>
                   </div>
                 ))}
             </div>
-          )}
-
-          <div className="pt-4 border-t border-gray-700">
-            <p className="text-sm text-gray-400">
-              <strong>Sales Workflow:</strong> When you create a deal, you'll assign it to a pipeline stage.
-              Move deals through stages using the Kanban board view. Deals in "Closed Won" or "Closed Lost"
-              stages are considered final.
-            </p>
           </div>
+        )}
+
+        <div className="pt-6 mt-6 border-t" style={{ borderColor: 'var(--hit-border)' }}>
+          <p className="text-sm" style={{ color: 'var(--hit-muted-foreground)' }}>
+            <strong style={{ color: 'var(--hit-foreground)' }}>Sales Workflow:</strong> When you create a deal, you'll assign it to a pipeline stage.
+            Move deals through stages using the Kanban board view. Deals in "Closed Won" or "Closed Lost"
+            stages are considered final.
+          </p>
         </div>
       </Card>
     </Page>

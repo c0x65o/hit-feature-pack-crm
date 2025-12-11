@@ -6,7 +6,7 @@
  * Components are exported individually for optimal tree-shaking.
  * When used with the route loader system, only the requested component is bundled.
  */
-export { Dashboard, DashboardPage, ContactList, ContactListPage, ContactDetail, ContactDetailPage, ContactEdit, ContactEditPage, CompanyList, CompanyListPage, CompanyDetail, CompanyDetailPage, CompanyEdit, CompanyEditPage, DealList, DealListPage, DealDetail, DealDetailPage, DealEdit, DealEditPage, ActivityList, ActivityListPage, } from './pages/index';
+export { Dashboard, DashboardPage, ContactList, ContactListPage, ContactDetail, ContactDetailPage, ContactEdit, ContactEditPage, CompanyList, CompanyListPage, CompanyDetail, CompanyDetailPage, CompanyEdit, CompanyEditPage, DealList, DealListPage, DealDetail, DealDetailPage, DealEdit, DealEditPage, ActivityList, ActivityListPage, ActivityEdit, ActivityEditPage, PipelineStageManage, PipelineStageManagePage, } from './pages/index';
 export * from './components/index';
 export * from './hooks/index';
 export { navContributions as nav } from './nav';

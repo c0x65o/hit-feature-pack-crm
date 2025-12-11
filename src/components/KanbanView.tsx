@@ -57,18 +57,29 @@ export function KanbanView({ onDealUpdate }: KanbanViewProps) {
 
   if (!stages || stages.length === 0) {
     return (
-      <EmptyState
-        title="No pipeline stages configured"
-        description="Configure pipeline stages to use the Kanban view"
-      />
+      <Card>
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold text-white mb-2">No pipeline stages configured</h3>
+          <p className="text-gray-400 mb-6">
+            You need to set up pipeline stages before you can use the Kanban view.
+          </p>
+          <button
+            onClick={() => window.location.href = '/crm/pipeline-stages'}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Setup Pipeline Stages
+          </button>
+        </div>
+      </Card>
     );
   }
 
   // Group deals by stage
-  const dealsByStage = stages.reduce((acc: Record<string, typeof deals>, stage) => {
-    acc[stage.id] = deals?.filter((deal: { pipelineStage: string }) => deal.pipelineStage === stage.id) || [];
+  const dealsArray = deals?.items || [];
+  const dealsByStage = stages.reduce((acc: Record<string, typeof dealsArray>, stage) => {
+    acc[stage.id] = dealsArray.filter((deal: { pipelineStage: string }) => deal.pipelineStage === stage.id);
     return acc;
-  }, {} as Record<string, typeof deals>);
+  }, {} as Record<string, typeof dealsArray>);
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-4">

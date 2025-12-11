@@ -21,7 +21,7 @@ const ACTIVITY_TYPES = [
 
 export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEditProps) {
   const activityId = id === 'new' ? undefined : id;
-  const { Page, Card, Input, Button, Select, Spinner } = useUi();
+  const { Page, Card, Input, Button, Select, Spinner, TextArea } = useUi();
   const { data: activityData, loading, createActivity, updateActivity } = useCrmActivities({ id: activityId });
   // Hook returns array - get first item when fetching by ID
   const activity = activityData && activityData.length > 0 ? activityData[0] : null;
@@ -101,21 +101,15 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
             value={activityType}
             onChange={setActivityType}
           />
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Note / Description *
-            </label>
-            <textarea
-              value={rawNoteText}
-              onChange={(e) => setRawNoteText(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[150px]"
-              placeholder="Enter activity notes..."
-              required
-            />
-            {fieldErrors.rawNoteText && (
-              <p className="mt-1 text-sm text-red-500">{fieldErrors.rawNoteText}</p>
-            )}
-          </div>
+          <TextArea
+            label="Note / Description"
+            value={rawNoteText}
+            onChange={setRawNoteText}
+            placeholder="Enter activity notes..."
+            required
+            error={fieldErrors.rawNoteText}
+            rows={6}
+          />
           <Input
             label="Task Due Date"
             type="text"
@@ -141,7 +135,7 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
             onChange={setRelatedDealId}
             placeholder="Deal UUID (optional)"
           />
-          <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-800">
+          <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
             <Button type="button" variant="secondary" onClick={() => navigate('/crm/activities')}>
               Cancel
             </Button>

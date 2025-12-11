@@ -1,1 +1,1 @@
-{"version":3,"file":"KanbanView.d.ts","sourceRoot":"","sources":["../../src/components/KanbanView.tsx"],"names":[],"mappings":"AAOA,UAAU,eAAe;IACvB,YAAY,CAAC,EAAE,CAAC,MAAM,EAAE,MAAM,EAAE,UAAU,EAAE,MAAM,KAAK,IAAI,CAAC;CAC7D;AAED,wBAAgB,UAAU,CAAC,EAAE,YAAY,EAAE,EAAE,eAAe,2CA+G3D"}
+{"version":3,"file":"KanbanView.d.ts","sourceRoot":"","sources":["../../src/components/KanbanView.tsx"],"names":[],"mappings":"AAOA,UAAU,eAAe;IACvB,YAAY,CAAC,EAAE,CAAC,MAAM,EAAE,MAAM,EAAE,UAAU,EAAE,MAAM,KAAK,IAAI,CAAC;CAC7D;AAED,wBAAgB,UAAU,CAAC,EAAE,YAAY,EAAE,EAAE,eAAe,2CA0H3D"}

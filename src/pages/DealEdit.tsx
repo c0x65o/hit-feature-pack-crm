@@ -108,7 +108,7 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
             placeholder="YYYY-MM-DD"
             error={fieldErrors.closeDateEstimate}
           />
-          {stages && (
+          {stages && stages.length > 0 ? (
             <Select
               label="Pipeline Stage"
               options={stages.map((s) => ({ value: s.id, label: s.name }))}
@@ -117,6 +117,19 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
               required
               error={fieldErrors.pipelineStage}
             />
+          ) : (
+            <div className="p-4 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+              <p className="text-yellow-400 text-sm mb-3">
+                No pipeline stages configured. You need to set up pipeline stages before creating deals.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.location.href = '/crm/pipeline-stages'}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                Setup Pipeline Stages
+              </button>
+            </div>
           )}
           <div className="flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-800">
             <Button type="submit" variant="primary">

@@ -47,11 +47,12 @@ export function KanbanView({ onDealUpdate }) {
         return _jsx(Spinner, {});
     }
     if (!stages || stages.length === 0) {
-        return (_jsx(EmptyState, { title: "No pipeline stages configured", description: "Configure pipeline stages to use the Kanban view" }));
+        return (_jsx(Card, { children: _jsxs("div", { className: "text-center py-12", children: [_jsx("h3", { className: "text-lg font-semibold text-white mb-2", children: "No pipeline stages configured" }), _jsx("p", { className: "text-gray-400 mb-6", children: "You need to set up pipeline stages before you can use the Kanban view." }), _jsx("button", { onClick: () => window.location.href = '/crm/pipeline-stages', className: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors", children: "Setup Pipeline Stages" })] }) }));
     }
     // Group deals by stage
+    const dealsArray = deals?.items || [];
     const dealsByStage = stages.reduce((acc, stage) => {
-        acc[stage.id] = deals?.filter((deal) => deal.pipelineStage === stage.id) || [];
+        acc[stage.id] = dealsArray.filter((deal) => deal.pipelineStage === stage.id);
         return acc;
     }, {});
     return (_jsx("div", { className: "flex gap-4 overflow-x-auto pb-4", children: stages.map((stage) => {

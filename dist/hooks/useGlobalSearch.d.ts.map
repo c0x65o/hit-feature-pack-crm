@@ -1,0 +1,1 @@
+{"version":3,"file":"useGlobalSearch.d.ts","sourceRoot":"","sources":["../../src/hooks/useGlobalSearch.ts"],"names":[],"mappings":"AAIA,UAAU,YAAY;IACpB,EAAE,EAAE,MAAM,CAAC;IACX,IAAI,EAAE,SAAS,GAAG,SAAS,GAAG,MAAM,CAAC;IACrC,IAAI,EAAE,MAAM,CAAC;IACb,QAAQ,CAAC,EAAE,MAAM,CAAC;IAClB,KAAK,CAAC,EAAE,MAAM,CAAC;CAChB;AAED,wBAAgB,eAAe,CAAC,KAAK,EAAE,MAAM;;;EA6B5C"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"ContactHeader.d.ts","sourceRoot":"","sources":["../../src/components/ContactHeader.tsx"],"names":[],"mappings":"AAKA,OAAO,KAAK,EAAE,UAAU,EAAE,MAAM,eAAe,CAAC;AAEhD,UAAU,kBAAkB;IAC1B,OAAO,EAAE,UAAU,CAAC;IACpB,WAAW,CAAC,EAAE,MAAM,CAAC;CACtB;AAED,wBAAgB,aAAa,CAAC,EAAE,OAAO,EAAE,WAAW,EAAE,EAAE,kBAAkB,2CAwDzE"}

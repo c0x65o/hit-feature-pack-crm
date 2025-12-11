@@ -1,0 +1,250 @@
+# Feature Pack: crm
+# CRM module with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export
+
+name: crm
+version: 1.0.0
+description: CRM feature pack with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export
+
+# Route definitions - mapped to React components
+routes:
+  - path: /crm
+    page: Dashboard
+    roles: []  # Empty = authenticated users only
+  - path: /crm/contacts
+    page: ContactList
+    roles: []
+  - path: /crm/contacts/new
+    page: ContactEdit
+    roles: []
+  - path: /crm/contacts/[id]
+    page: ContactDetail
+    roles: []
+  - path: /crm/contacts/[id]/edit
+    page: ContactEdit
+    roles: []
+  - path: /crm/companies
+    page: CompanyList
+    roles: []
+  - path: /crm/companies/new
+    page: CompanyEdit
+    roles: []
+  - path: /crm/companies/[id]
+    page: CompanyDetail
+    roles: []
+  - path: /crm/companies/[id]/edit
+    page: CompanyEdit
+    roles: []
+  - path: /crm/deals
+    page: DealList
+    roles: []
+  - path: /crm/deals/new
+    page: DealEdit
+    roles: []
+  - path: /crm/deals/[id]
+    page: DealDetail
+    roles: []
+  - path: /crm/deals/[id]/edit
+    page: DealEdit
+    roles: []
+  - path: /crm/activities
+    page: ActivityList
+    roles: []
+
+# Navigation contributions - auto-added to shell sidebar
+nav:
+  - id: crm
+    label: CRM
+    path: /crm
+    icon: Users
+    group: main  # Primary business features
+    showWhen: authenticated
+    weight: 100  # Primary content near top (lower weight = higher position)
+    children:
+      - id: crm-dashboard
+        label: Dashboard
+        path: /crm
+        icon: LayoutDashboard
+        weight: 100
+        showWhen: authenticated
+      - id: crm-contacts
+        label: Contacts
+        path: /crm/contacts
+        icon: User
+        weight: 110
+        showWhen: authenticated
+      - id: crm-companies
+        label: Companies
+        path: /crm/companies
+        icon: Building
+        weight: 120
+        showWhen: authenticated
+      - id: crm-deals
+        label: Deals
+        path: /crm/deals
+        icon: TrendingUp
+        weight: 130
+        showWhen: authenticated
+      - id: crm-activities
+        label: Activities
+        path: /crm/activities
+        icon: Activity
+        weight: 140
+        showWhen: authenticated
+
+# Notification types this pack can emit
+notifications:
+  types:
+    - id: deal_closed_won
+      title: Deal Closed Won
+      icon: CheckCircle
+      priority: high
+    - id: contact_created
+      title: New Contact Created
+      icon: UserPlus
+      priority: medium
+    - id: task_due
+      title: Task Due
+      icon: Clock
+      priority: high
+
+# Schema contributions (Drizzle tables)
+# Projects import these into their schema
+schema:
+  source: src/schema/crm.ts
+  exports: [
+    crmContacts,
+    crmCompanies,
+    crmDeals,
+    crmActivities,
+    crmPersonalNotes,
+    crmPipelineStages,
+    crmWebhookConfigs,
+    crmApiKeys,
+    crmOpenaiKeys,
+    CrmContact,
+    CrmCompany,
+    CrmDeal,
+    CrmActivity,
+    CrmPersonalNote,
+    CrmPipelineStage,
+    CrmWebhookConfig,
+    CrmApiKey,
+    CrmOpenaiKey,
+    InsertCrmContact,
+    InsertCrmCompany,
+    InsertCrmDeal,
+    InsertCrmActivity,
+    InsertCrmPersonalNote,
+    InsertCrmPipelineStage,
+    InsertCrmWebhookConfig,
+    InsertCrmApiKey,
+    InsertCrmOpenaiKey
+  ]
+
+# API routes the feature pack expects
+# Projects create these routes using the schema
+api:
+  routes:
+    - path: /api/crm/contacts
+      methods: [GET, POST]
+      description: "List contacts (GET) or create contact (POST)"
+    - path: /api/crm/contacts/[id]
+      methods: [GET, PUT, DELETE]
+      description: "Get, update, or delete a specific contact"
+    - path: /api/crm/companies
+      methods: [GET, POST]
+      description: "List companies (GET) or create company (POST)"
+    - path: /api/crm/companies/[id]
+      methods: [GET, PUT, DELETE]
+      description: "Get, update, or delete a specific company"
+    - path: /api/crm/deals
+      methods: [GET, POST]
+      description: "List deals (GET) or create deal (POST)"
+    - path: /api/crm/deals/[id]
+      methods: [GET, PUT, DELETE]
+      description: "Get, update, or delete a specific deal"
+    - path: /api/crm/deals/reassign
+      methods: [POST]
+      description: "Reassign deals from inactive user to new owner"
+    - path: /api/crm/activities
+      methods: [GET, POST]
+      description: "List activities (GET) or create activity (POST)"
+    - path: /api/crm/activities/[id]
+      methods: [GET, PUT, DELETE]
+      description: "Get, update, or delete a specific activity"
+    - path: /api/crm/personal-notes
+      methods: [GET, POST]
+      description: "List personal notes (GET) or create note (POST), scoped by user"
+    - path: /api/crm/reports/close-rate
+      methods: [GET]
+      description: "Get close rate KPI"
+    - path: /api/crm/reports/acv
+      methods: [GET]
+      description: "Get average contract value (ACV) KPI"
+    - path: /api/crm/reports/sales-cycle
+      methods: [GET]
+      description: "Get average sales cycle length KPI"
+    - path: /api/crm/reports/pipeline-health
+      methods: [GET]
+      description: "Get pipeline health by stage"
+    - path: /api/crm/data-export
+      methods: [GET]
+      description: "Bulk data export (requires API key authentication)"
+    - path: /api/crm/webhooks
+      methods: [GET, POST, PUT, DELETE]
+      description: "Manage webhook configurations"
+
+# No module dependencies - runs on project's own database
+requires:
+  modules: []
+
+# Dependencies on other feature packs
+dependencies:
+  feature_packs:
+    - name: dashboard-shell
+
+# Configurable options
+config:
+  schema:
+    pipeline_stages:
+      type: array
+      default: []
+      description: "Array of pipeline stage configurations. If empty, uses default stages."
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+            description: "Stage name (e.g., 'Prospecting', 'Qualification')"
+          order:
+            type: integer
+            description: "Display order"
+          is_closed_won:
+            type: boolean
+            default: false
+            description: "Whether this stage represents a closed-won deal"
+          is_closed_lost:
+            type: boolean
+            default: false
+            description: "Whether this stage represents a closed-lost deal"
+    openai_enabled:
+      type: boolean
+      default: false
+      description: "Enable OpenAI LLM integration for activity parsing"
+    llm_activity_parsing:
+      type: boolean
+      default: true
+      description: "Enable automatic LLM parsing of activity text (requires openai_enabled)"
+    webhook_enabled:
+      type: boolean
+      default: false
+      description: "Enable webhook notifications"
+    webhook_url:
+      type: string
+      default: ""
+      description: "Webhook URL for notifications (optional, can be configured per customer in database)"
+    data_export_enabled:
+      type: boolean
+      default: true
+      description: "Enable data export API"
+

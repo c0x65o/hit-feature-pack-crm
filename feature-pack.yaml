@@ -142,7 +142,8 @@ schema:
   ]
 
 # API routes the feature pack expects
-# Projects create these routes using the schema
+# Applications should create these routes using the schema (similar to notepad)
+# The feature pack generator may auto-generate simple CRUD routes in the future
 api:
   routes:
     - path: /api/crm/contacts

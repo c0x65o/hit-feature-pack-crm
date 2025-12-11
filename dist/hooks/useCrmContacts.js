@@ -45,8 +45,11 @@ export function useCrmContacts(options = {}) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contact),
         });
-        if (!res.ok)
-            throw new Error('Failed to create contact');
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMessage = errorData.error || `Failed to create contact (${res.status})`;
+            throw new Error(errorMessage);
+        }
         return res.json();
     };
     const updateContact = async (id, contact) => {
@@ -55,8 +58,11 @@ export function useCrmContacts(options = {}) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contact),
         });
-        if (!res.ok)
-            throw new Error('Failed to update contact');
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMessage = errorData.error || `Failed to update contact (${res.status})`;
+            throw new Error(errorMessage);
+        }
         return res.json();
     };
     return { data, loading, error, createContact, updateContact };

@@ -113,15 +113,18 @@ export function ContactEdit({ id, onNavigate }) {
             let result;
             if (contactId) {
                 result = await updateContact(contactId, data);
+                console.log('Contact updated:', result);
                 navigate(`/crm/contacts/${contactId}`);
             }
             else {
                 result = await createContact(data);
+                console.log('Contact created:', result);
                 if (result && result.id) {
                     navigate(`/crm/contacts/${result.id}`);
                 }
                 else {
-                    throw new Error('Contact created but no ID returned');
+                    console.error('Contact created but no ID returned:', result);
+                    throw new Error('Contact created but no ID returned. Please refresh the page.');
                 }
             }
         }

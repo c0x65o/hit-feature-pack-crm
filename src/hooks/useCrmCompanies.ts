@@ -18,9 +18,14 @@ export function useCrmCompanies(options: UseCrmCompaniesOptions = {}) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const url = options.id
+        let url = options.id
           ? `/api/crm/companies/${options.id}`
           : `/api/crm/companies?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+        
+        if (options.search && !options.id) {
+          url += `&search=${encodeURIComponent(options.search)}`;
+        }
+        
         const res = await fetch(url);
         if (!res.ok) throw new Error('Failed to fetch companies');
         const json = await res.json();
@@ -33,7 +38,7 @@ export function useCrmCompanies(options: UseCrmCompaniesOptions = {}) {
     };
 
     fetchData();
-  }, [options.id, options.page, options.pageSize]);
+  }, [options.id, options.page, options.pageSize, options.search]);
 
   const createCompany = async (company: any) => {
     const res = await fetch('/api/crm/companies', {

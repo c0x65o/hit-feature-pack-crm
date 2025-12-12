@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { useCrmPipelineStages } from '../hooks/useCrmPipelineStages';
+import { CurrencyInput, DateInput } from '../components/fields';
 
 interface DealEditProps {
   id?: string;
@@ -17,16 +18,16 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
   const { data: stages } = useCrmPipelineStages();
 
   const [dealName, setDealName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [closeDateEstimate, setCloseDateEstimate] = useState('');
+  const [amount, setAmount] = useState<number | null>(null);
+  const [closeDateEstimate, setCloseDateEstimate] = useState<string | null>(null);
   const [pipelineStage, setPipelineStage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (deal) {
       setDealName(deal.dealName || '');
-      setAmount(deal.amount?.toString() || '');
-      setCloseDateEstimate(deal.closeDateEstimate ? new Date(deal.closeDateEstimate).toISOString().split('T')[0] : '');
+      setAmount(deal.amount ? (typeof deal.amount === 'string' ? parseFloat(deal.amount) : deal.amount) : null);
+      setCloseDateEstimate(deal.closeDateEstimate ? new Date(deal.closeDateEstimate).toISOString().split('T')[0] : null);
       setPipelineStage(deal.pipelineStage || '');
     }
   }, [deal]);
@@ -44,7 +45,7 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
     if (!dealName.trim()) {
       errors.dealName = 'Deal Name is required';
     }
-    if (!amount.trim()) {
+    if (amount === null || Number.isNaN(amount)) {
       errors.amount = 'Amount is required';
     }
     if (!pipelineStage) {
@@ -61,7 +62,7 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
     try {
       const data = {
         dealName,
-        amount: parseFloat(amount),
+        amount: amount!,
         closeDateEstimate: closeDateEstimate || undefined,
         pipelineStage,
       };
@@ -92,20 +93,17 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
             required
             error={fieldErrors.dealName}
           />
-          <Input
+          <CurrencyInput
             label="Amount"
-            type="number"
             value={amount}
             onChange={setAmount}
             required
             error={fieldErrors.amount}
           />
-          <Input
+          <DateInput
             label="Close Date Estimate"
-            type="text"
             value={closeDateEstimate}
             onChange={setCloseDateEstimate}
-            placeholder="YYYY-MM-DD"
             error={fieldErrors.closeDateEstimate}
           />
           {stages && stages.length > 0 ? (

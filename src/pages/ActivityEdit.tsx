@@ -5,6 +5,7 @@ import { useUi } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 import { ContactAutocomplete } from '../components/ContactAutocomplete';
 import { DealAutocomplete } from '../components/DealAutocomplete';
+import { DateInput } from '../components/fields';
 
 interface ActivityEditProps {
   id?: string;
@@ -30,7 +31,7 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
 
   const [rawNoteText, setRawNoteText] = useState('');
   const [activityType, setActivityType] = useState('');
-  const [taskDueDate, setTaskDueDate] = useState('');
+  const [taskDueDate, setTaskDueDate] = useState<string | null>(null);
   const [taskDescription, setTaskDescription] = useState('');
   const [relatedContactId, setRelatedContactId] = useState(contactId || '');
   const [relatedDealId, setRelatedDealId] = useState(dealId || '');
@@ -112,12 +113,10 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
             error={fieldErrors.rawNoteText}
             rows={6}
           />
-          <Input
+          <DateInput
             label="Task Due Date"
-            type="text"
             value={taskDueDate}
             onChange={setTaskDueDate}
-            placeholder="YYYY-MM-DD"
           />
           <Input
             label="Task Description"

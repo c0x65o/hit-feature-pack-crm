@@ -1,4 +1,4 @@
-export declare function PipelineStageManage({ onNavigate }: {
+export declare function PipelineStageManage({ onNavigate: _onNavigate }: {
     onNavigate?: (path: string) => void;
 }): import("react/jsx-runtime").JSX.Element;
 export default PipelineStageManage;

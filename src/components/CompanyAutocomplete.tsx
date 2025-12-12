@@ -2,62 +2,62 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useUi } from '@hit/ui-kit';
-import { useCrmDeals } from '../hooks/useCrmDeals';
-import { TrendingUp } from 'lucide-react';
+import { useCrmCompanies } from '../hooks/useCrmCompanies';
+import { Building } from 'lucide-react';
 
-interface DealAutocompleteProps {
+interface CompanyAutocompleteProps {
   value: string;
-  onChange: (dealId: string) => void;
+  onChange: (companyId: string) => void;
   label?: string;
   placeholder?: string;
   disabled?: boolean;
 }
 
-export function DealAutocomplete({
+export function CompanyAutocomplete({
   value,
   onChange,
-  label = 'Related Deal',
-  placeholder = 'Search for a deal...',
+  label = 'Company',
+  placeholder = 'Search for a company...',
   disabled = false,
-}: DealAutocompleteProps) {
+}: CompanyAutocompleteProps) {
   const { Input } = useUi();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedDeal, setSelectedDeal] = useState<{ id: string; name: string } | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<{ id: string; name: string } | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch deal details when value changes
+  // Fetch company details when value changes
   useEffect(() => {
-    if (value && !selectedDeal) {
-      const fetchDeal = async () => {
+    if (value && !selectedCompany) {
+      const fetchCompany = async () => {
         try {
-          const res = await fetch(`/api/crm/deals/${value}`);
+          const res = await fetch(`/api/crm/companies/${value}`);
           if (res.ok) {
-            const deal = await res.json();
-            setSelectedDeal({ id: deal.id, name: deal.dealName || 'Unknown Deal' });
-            setSearchQuery(deal.dealName || '');
+            const company = await res.json();
+            setSelectedCompany({ id: company.id, name: company.name || 'Unknown Company' });
+            setSearchQuery(company.name || '');
           }
         } catch (error) {
-          console.error('Error fetching deal:', error);
+          console.error('Error fetching company:', error);
         }
       };
-      fetchDeal();
+      fetchCompany();
     } else if (!value) {
-      setSelectedDeal(null);
+      setSelectedCompany(null);
       setSearchQuery('');
     }
-  }, [value, selectedDeal]);
+  }, [value, selectedCompany]);
 
-  const { data: dealsData, loading } = useCrmDeals({
+  const { data: companiesData, loading } = useCrmCompanies({
     search: searchQuery,
     pageSize: 10,
   });
 
-  const deals = dealsData?.items || [];
+  const companies = companiesData?.items || [];
 
   // Debounce search
   useEffect(() => {
@@ -65,13 +65,13 @@ export function DealAutocomplete({
       clearTimeout(timeoutRef.current);
     }
 
-    if (searchQuery.length < 2 && !selectedDeal) {
+    if (searchQuery.length < 2 && !selectedCompany) {
       setShowSuggestions(false);
       setHighlightedIndex(-1);
       return;
     }
 
-    if (selectedDeal && searchQuery === selectedDeal.name) {
+    if (selectedCompany && searchQuery === selectedCompany.name) {
       setShowSuggestions(false);
       setHighlightedIndex(-1);
       return;
@@ -87,7 +87,7 @@ export function DealAutocomplete({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [searchQuery, selectedDeal]);
+  }, [searchQuery, selectedCompany]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -102,10 +102,10 @@ export function DealAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelectDeal = (deal: { id: string; name: string }) => {
-    setSelectedDeal(deal);
-    setSearchQuery(deal.name);
-    onChange(deal.id);
+  const handleSelectCompany = (company: { id: string; name: string }) => {
+    setSelectedCompany(company);
+    setSearchQuery(company.name);
+    onChange(company.id);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
     inputRef.current?.querySelector('input')?.blur();
@@ -114,14 +114,14 @@ export function DealAutocomplete({
   const handleInputChange = (newValue: string) => {
     setSearchQuery(newValue);
     if (!newValue) {
-      setSelectedDeal(null);
+      setSelectedCompany(null);
       onChange('');
     }
   };
 
   const handleClear = () => {
     setSearchQuery('');
-    setSelectedDeal(null);
+    setSelectedCompany(null);
     onChange('');
     setShowSuggestions(false);
     setHighlightedIndex(-1);
@@ -130,9 +130,9 @@ export function DealAutocomplete({
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSuggestions || deals.length === 0) {
-      if (e.key === 'Enter' && selectedDeal) {
-        // Allow form submission if deal is selected
+    if (!showSuggestions || companies.length === 0) {
+      if (e.key === 'Enter' && selectedCompany) {
+        // Allow form submission if company is selected
         return;
       }
       return;
@@ -142,7 +142,7 @@ export function DealAutocomplete({
       case 'ArrowDown':
         e.preventDefault();
         setHighlightedIndex((prev) => 
-          prev < deals.length - 1 ? prev + 1 : prev
+          prev < companies.length - 1 ? prev + 1 : prev
         );
         break;
       case 'ArrowUp':
@@ -151,10 +151,10 @@ export function DealAutocomplete({
         break;
       case 'Enter':
         e.preventDefault();
-        if (highlightedIndex >= 0 && highlightedIndex < deals.length) {
-          handleSelectDeal({ 
-            id: deals[highlightedIndex].id, 
-            name: deals[highlightedIndex].dealName 
+        if (highlightedIndex >= 0 && highlightedIndex < companies.length) {
+          handleSelectCompany({ 
+            id: companies[highlightedIndex].id, 
+            name: companies[highlightedIndex].name 
           });
         }
         break;
@@ -177,21 +177,10 @@ export function DealAutocomplete({
     }
   }, [highlightedIndex]);
 
-  const formatCurrency = (amount: string | number | null | undefined) => {
-    if (!amount) return '';
-    const num = parseFloat(amount.toString());
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(num);
-  };
-
   return (
     <div ref={containerRef} className="relative">
       <div className="relative">
-        {selectedDeal && (
+        {selectedCompany && (
           <button
             type="button"
             onClick={handleClear}
@@ -212,18 +201,18 @@ export function DealAutocomplete({
             disabled={disabled}
             aria-autocomplete="list"
             aria-expanded={showSuggestions}
-            aria-controls="deal-autocomplete-list"
-            aria-activedescendant={highlightedIndex >= 0 ? `deal-option-${highlightedIndex}` : undefined}
+            aria-controls="company-autocomplete-list"
+            aria-activedescendant={highlightedIndex >= 0 ? `company-option-${highlightedIndex}` : undefined}
           />
         </div>
       </div>
 
-      {showSuggestions && !selectedDeal && (
+      {showSuggestions && !selectedCompany && (
         <div
           ref={suggestionsRef}
-          id="deal-autocomplete-list"
+          id="company-autocomplete-list"
           role="listbox"
-          aria-label="Deal suggestions"
+          aria-label="Company suggestions"
           style={{
             position: 'absolute',
             top: '100%',
@@ -247,39 +236,39 @@ export function DealAutocomplete({
             >
               Searching...
             </div>
-          ) : deals.length === 0 ? (
+          ) : companies.length === 0 ? (
             <div 
               role="status"
               style={{ padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted, #888)' }}
             >
-              No deals found
+              No companies found
             </div>
           ) : (
-            deals.map((deal: { id: string; dealName: string; amount?: string | number | null }, index: number) => (
+            companies.map((company: { id: string; name: string; city?: string; state?: string }, index: number) => (
               <div
-                key={deal.id}
-                id={`deal-option-${index}`}
+                key={company.id}
+                id={`company-option-${index}`}
                 role="option"
                 aria-selected={highlightedIndex === index}
-                onClick={() => handleSelectDeal({ id: deal.id, name: deal.dealName })}
+                onClick={() => handleSelectCompany({ id: company.id, name: company.name })}
                 style={{
                   padding: '12px 16px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  borderBottom: index < deals.length - 1 ? '1px solid var(--border-default, #333)' : 'none',
+                  borderBottom: index < companies.length - 1 ? '1px solid var(--border-default, #333)' : 'none',
                   backgroundColor: highlightedIndex === index ? 'var(--bg-hover, #2a2a2a)' : 'transparent',
                 }}
                 onMouseEnter={() => setHighlightedIndex(index)}
                 onMouseLeave={() => setHighlightedIndex(-1)}
               >
-                <TrendingUp size={16} style={{ color: 'var(--text-muted, #888)' }} />
+                <Building size={16} style={{ color: 'var(--text-muted, #888)' }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, marginBottom: '2px' }}>{deal.dealName}</div>
-                  {deal.amount && (
+                  <div style={{ fontWeight: 500, marginBottom: '2px' }}>{company.name}</div>
+                  {(company.city || company.state) && (
                     <div style={{ fontSize: '12px', color: 'var(--text-muted, #888)' }}>
-                      {formatCurrency(deal.amount)}
+                      {[company.city, company.state].filter(Boolean).join(', ')}
                     </div>
                   )}
                 </div>
@@ -291,4 +280,3 @@ export function DealAutocomplete({
     </div>
   );
 }
-

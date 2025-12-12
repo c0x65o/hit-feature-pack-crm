@@ -2,57 +2,57 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useEffect, useRef } from 'react';
 import { useUi } from '@hit/ui-kit';
-import { useCrmDeals } from '../hooks/useCrmDeals';
-import { TrendingUp } from 'lucide-react';
-export function DealAutocomplete({ value, onChange, label = 'Related Deal', placeholder = 'Search for a deal...', disabled = false, }) {
+import { useCrmCompanies } from '../hooks/useCrmCompanies';
+import { Building } from 'lucide-react';
+export function CompanyAutocomplete({ value, onChange, label = 'Company', placeholder = 'Search for a company...', disabled = false, }) {
     const { Input } = useUi();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [selectedDeal, setSelectedDeal] = useState(null);
+    const [selectedCompany, setSelectedCompany] = useState(null);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
     const containerRef = useRef(null);
     const inputRef = useRef(null);
     const suggestionsRef = useRef(null);
     const timeoutRef = useRef(null);
-    // Fetch deal details when value changes
+    // Fetch company details when value changes
     useEffect(() => {
-        if (value && !selectedDeal) {
-            const fetchDeal = async () => {
+        if (value && !selectedCompany) {
+            const fetchCompany = async () => {
                 try {
-                    const res = await fetch(`/api/crm/deals/${value}`);
+                    const res = await fetch(`/api/crm/companies/${value}`);
                     if (res.ok) {
-                        const deal = await res.json();
-                        setSelectedDeal({ id: deal.id, name: deal.dealName || 'Unknown Deal' });
-                        setSearchQuery(deal.dealName || '');
+                        const company = await res.json();
+                        setSelectedCompany({ id: company.id, name: company.name || 'Unknown Company' });
+                        setSearchQuery(company.name || '');
                     }
                 }
                 catch (error) {
-                    console.error('Error fetching deal:', error);
+                    console.error('Error fetching company:', error);
                 }
             };
-            fetchDeal();
+            fetchCompany();
         }
         else if (!value) {
-            setSelectedDeal(null);
+            setSelectedCompany(null);
             setSearchQuery('');
         }
-    }, [value, selectedDeal]);
-    const { data: dealsData, loading } = useCrmDeals({
+    }, [value, selectedCompany]);
+    const { data: companiesData, loading } = useCrmCompanies({
         search: searchQuery,
         pageSize: 10,
     });
-    const deals = dealsData?.items || [];
+    const companies = companiesData?.items || [];
     // Debounce search
     useEffect(() => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
-        if (searchQuery.length < 2 && !selectedDeal) {
+        if (searchQuery.length < 2 && !selectedCompany) {
             setShowSuggestions(false);
             setHighlightedIndex(-1);
             return;
         }
-        if (selectedDeal && searchQuery === selectedDeal.name) {
+        if (selectedCompany && searchQuery === selectedCompany.name) {
             setShowSuggestions(false);
             setHighlightedIndex(-1);
             return;
@@ -66,7 +66,7 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
                 clearTimeout(timeoutRef.current);
             }
         };
-    }, [searchQuery, selectedDeal]);
+    }, [searchQuery, selectedCompany]);
     // Close suggestions when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -78,10 +78,10 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-    const handleSelectDeal = (deal) => {
-        setSelectedDeal(deal);
-        setSearchQuery(deal.name);
-        onChange(deal.id);
+    const handleSelectCompany = (company) => {
+        setSelectedCompany(company);
+        setSearchQuery(company.name);
+        onChange(company.id);
         setShowSuggestions(false);
         setHighlightedIndex(-1);
         inputRef.current?.querySelector('input')?.blur();
@@ -89,13 +89,13 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
     const handleInputChange = (newValue) => {
         setSearchQuery(newValue);
         if (!newValue) {
-            setSelectedDeal(null);
+            setSelectedCompany(null);
             onChange('');
         }
     };
     const handleClear = () => {
         setSearchQuery('');
-        setSelectedDeal(null);
+        setSelectedCompany(null);
         onChange('');
         setShowSuggestions(false);
         setHighlightedIndex(-1);
@@ -103,9 +103,9 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
     };
     // Keyboard navigation
     const handleKeyDown = (e) => {
-        if (!showSuggestions || deals.length === 0) {
-            if (e.key === 'Enter' && selectedDeal) {
-                // Allow form submission if deal is selected
+        if (!showSuggestions || companies.length === 0) {
+            if (e.key === 'Enter' && selectedCompany) {
+                // Allow form submission if company is selected
                 return;
             }
             return;
@@ -113,7 +113,7 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
         switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
-                setHighlightedIndex((prev) => prev < deals.length - 1 ? prev + 1 : prev);
+                setHighlightedIndex((prev) => prev < companies.length - 1 ? prev + 1 : prev);
                 break;
             case 'ArrowUp':
                 e.preventDefault();
@@ -121,10 +121,10 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
                 break;
             case 'Enter':
                 e.preventDefault();
-                if (highlightedIndex >= 0 && highlightedIndex < deals.length) {
-                    handleSelectDeal({
-                        id: deals[highlightedIndex].id,
-                        name: deals[highlightedIndex].dealName
+                if (highlightedIndex >= 0 && highlightedIndex < companies.length) {
+                    handleSelectCompany({
+                        id: companies[highlightedIndex].id,
+                        name: companies[highlightedIndex].name
                     });
                 }
                 break;
@@ -145,18 +145,7 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
             }
         }
     }, [highlightedIndex]);
-    const formatCurrency = (amount) => {
-        if (!amount)
-            return '';
-        const num = parseFloat(amount.toString());
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(num);
-    };
-    return (_jsxs("div", { ref: containerRef, className: "relative", children: [_jsxs("div", { className: "relative", children: [selectedDeal && (_jsx("button", { type: "button", onClick: handleClear, className: "absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10", style: { marginTop: '12px' }, "aria-label": "Clear selection", children: "\u00D7" })), _jsx("div", { ref: inputRef, children: _jsx(Input, { label: label, value: searchQuery, onChange: handleInputChange, onKeyDown: handleKeyDown, placeholder: placeholder, disabled: disabled, "aria-autocomplete": "list", "aria-expanded": showSuggestions, "aria-controls": "deal-autocomplete-list", "aria-activedescendant": highlightedIndex >= 0 ? `deal-option-${highlightedIndex}` : undefined }) })] }), showSuggestions && !selectedDeal && (_jsx("div", { ref: suggestionsRef, id: "deal-autocomplete-list", role: "listbox", "aria-label": "Deal suggestions", style: {
+    return (_jsxs("div", { ref: containerRef, className: "relative", children: [_jsxs("div", { className: "relative", children: [selectedCompany && (_jsx("button", { type: "button", onClick: handleClear, className: "absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10", style: { marginTop: '12px' }, "aria-label": "Clear selection", children: "\u00D7" })), _jsx("div", { ref: inputRef, children: _jsx(Input, { label: label, value: searchQuery, onChange: handleInputChange, onKeyDown: handleKeyDown, placeholder: placeholder, disabled: disabled, "aria-autocomplete": "list", "aria-expanded": showSuggestions, "aria-controls": "company-autocomplete-list", "aria-activedescendant": highlightedIndex >= 0 ? `company-option-${highlightedIndex}` : undefined }) })] }), showSuggestions && !selectedCompany && (_jsx("div", { ref: suggestionsRef, id: "company-autocomplete-list", role: "listbox", "aria-label": "Company suggestions", style: {
                     position: 'absolute',
                     top: '100%',
                     left: 0,
@@ -169,14 +158,14 @@ export function DealAutocomplete({ value, onChange, label = 'Related Deal', plac
                     maxHeight: '300px',
                     overflowY: 'auto',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                }, children: loading ? (_jsx("div", { role: "status", "aria-live": "polite", style: { padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted, #888)' }, children: "Searching..." })) : deals.length === 0 ? (_jsx("div", { role: "status", style: { padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted, #888)' }, children: "No deals found" })) : (deals.map((deal, index) => (_jsxs("div", { id: `deal-option-${index}`, role: "option", "aria-selected": highlightedIndex === index, onClick: () => handleSelectDeal({ id: deal.id, name: deal.dealName }), style: {
+                }, children: loading ? (_jsx("div", { role: "status", "aria-live": "polite", style: { padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted, #888)' }, children: "Searching..." })) : companies.length === 0 ? (_jsx("div", { role: "status", style: { padding: '12px 16px', textAlign: 'center', color: 'var(--text-muted, #888)' }, children: "No companies found" })) : (companies.map((company, index) => (_jsxs("div", { id: `company-option-${index}`, role: "option", "aria-selected": highlightedIndex === index, onClick: () => handleSelectCompany({ id: company.id, name: company.name }), style: {
                         padding: '12px 16px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        borderBottom: index < deals.length - 1 ? '1px solid var(--border-default, #333)' : 'none',
+                        borderBottom: index < companies.length - 1 ? '1px solid var(--border-default, #333)' : 'none',
                         backgroundColor: highlightedIndex === index ? 'var(--bg-hover, #2a2a2a)' : 'transparent',
-                    }, onMouseEnter: () => setHighlightedIndex(index), onMouseLeave: () => setHighlightedIndex(-1), children: [_jsx(TrendingUp, { size: 16, style: { color: 'var(--text-muted, #888)' } }), _jsxs("div", { style: { flex: 1 }, children: [_jsx("div", { style: { fontWeight: 500, marginBottom: '2px' }, children: deal.dealName }), deal.amount && (_jsx("div", { style: { fontSize: '12px', color: 'var(--text-muted, #888)' }, children: formatCurrency(deal.amount) }))] })] }, deal.id)))) }))] }));
+                    }, onMouseEnter: () => setHighlightedIndex(index), onMouseLeave: () => setHighlightedIndex(-1), children: [_jsx(Building, { size: 16, style: { color: 'var(--text-muted, #888)' } }), _jsxs("div", { style: { flex: 1 }, children: [_jsx("div", { style: { fontWeight: 500, marginBottom: '2px' }, children: company.name }), (company.city || company.state) && (_jsx("div", { style: { fontSize: '12px', color: 'var(--text-muted, #888)' }, children: [company.city, company.state].filter(Boolean).join(', ') }))] })] }, company.id)))) }))] }));
 }
-//# sourceMappingURL=DealAutocomplete.js.map
+//# sourceMappingURL=CompanyAutocomplete.js.map

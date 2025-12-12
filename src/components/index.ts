@@ -19,4 +19,6 @@ export { LeadsByStatusChart } from './LeadsByStatusChart';
 export { AddressAutocomplete } from './AddressAutocomplete';
 export { ContactAutocomplete } from './ContactAutocomplete';
 export { DealAutocomplete } from './DealAutocomplete';
+export { CompanyAutocomplete } from './CompanyAutocomplete';
+export * from './fields';
 

@@ -1,11 +1,9 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useEffect, useRef } from 'react';
-import { useUi } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { Building } from 'lucide-react';
 export function CompanyAutocomplete({ value, onChange, label = 'Company', placeholder = 'Search for a company...', disabled = false, }) {
-    const { Input } = useUi();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -84,9 +82,10 @@ export function CompanyAutocomplete({ value, onChange, label = 'Company', placeh
         onChange(company.id);
         setShowSuggestions(false);
         setHighlightedIndex(-1);
-        inputRef.current?.querySelector('input')?.blur();
+        inputRef.current?.blur();
     };
-    const handleInputChange = (newValue) => {
+    const handleInputChange = (e) => {
+        const newValue = e.target.value;
         setSearchQuery(newValue);
         if (!newValue) {
             setSelectedCompany(null);
@@ -99,7 +98,7 @@ export function CompanyAutocomplete({ value, onChange, label = 'Company', placeh
         onChange('');
         setShowSuggestions(false);
         setHighlightedIndex(-1);
-        inputRef.current?.querySelector('input')?.focus();
+        inputRef.current?.focus();
     };
     // Keyboard navigation
     const handleKeyDown = (e) => {
@@ -132,7 +131,7 @@ export function CompanyAutocomplete({ value, onChange, label = 'Company', placeh
                 e.preventDefault();
                 setShowSuggestions(false);
                 setHighlightedIndex(-1);
-                inputRef.current?.querySelector('input')?.blur();
+                inputRef.current?.blur();
                 break;
         }
     };
@@ -145,7 +144,25 @@ export function CompanyAutocomplete({ value, onChange, label = 'Company', placeh
             }
         }
     }, [highlightedIndex]);
-    return (_jsxs("div", { ref: containerRef, className: "relative", children: [_jsxs("div", { className: "relative", children: [selectedCompany && (_jsx("button", { type: "button", onClick: handleClear, className: "absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10", style: { marginTop: '12px' }, "aria-label": "Clear selection", children: "\u00D7" })), _jsx("div", { ref: inputRef, children: _jsx(Input, { label: label, value: searchQuery, onChange: handleInputChange, onKeyDown: handleKeyDown, placeholder: placeholder, disabled: disabled, "aria-autocomplete": "list", "aria-expanded": showSuggestions, "aria-controls": "company-autocomplete-list", "aria-activedescendant": highlightedIndex >= 0 ? `company-option-${highlightedIndex}` : undefined }) })] }), showSuggestions && !selectedCompany && (_jsx("div", { ref: suggestionsRef, id: "company-autocomplete-list", role: "listbox", "aria-label": "Company suggestions", style: {
+    return (_jsxs("div", { ref: containerRef, className: "relative", children: [_jsxs("div", { className: "relative", children: [selectedCompany && (_jsx("button", { type: "button", onClick: handleClear, className: "absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 z-10", style: { marginTop: '12px' }, "aria-label": "Clear selection", children: "\u00D7" })), _jsxs("div", { children: [label && (_jsx("label", { style: {
+                                    display: 'block',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    color: 'var(--hit-foreground)',
+                                    marginBottom: '8px',
+                                }, children: label })), _jsx("input", { ref: inputRef, type: "text", value: searchQuery, onChange: handleInputChange, onKeyDown: handleKeyDown, placeholder: placeholder, disabled: disabled, "aria-autocomplete": "list", "aria-expanded": showSuggestions, "aria-controls": "company-autocomplete-list", "aria-activedescendant": highlightedIndex >= 0 ? `company-option-${highlightedIndex}` : undefined, style: {
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    backgroundColor: 'var(--hit-input-bg)',
+                                    border: '1px solid var(--hit-input-border)',
+                                    borderRadius: '6px',
+                                    color: 'var(--hit-foreground)',
+                                    fontSize: '14px',
+                                    outline: 'none',
+                                    opacity: disabled ? 0.5 : 1,
+                                    cursor: disabled ? 'not-allowed' : 'text',
+                                    boxSizing: 'border-box',
+                                } })] })] }), showSuggestions && !selectedCompany && (_jsx("div", { ref: suggestionsRef, id: "company-autocomplete-list", role: "listbox", "aria-label": "Company suggestions", style: {
                     position: 'absolute',
                     top: '100%',
                     left: 0,

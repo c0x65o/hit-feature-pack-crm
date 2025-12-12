@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useUi } from '@hit/ui-kit';
 import { TaskWidget } from '../components/TaskWidget';
 import { StuckDealsWidget } from '../components/StuckDealsWidget';
@@ -10,20 +11,11 @@ import { PipelineMetrics } from '../components/PipelineMetrics';
 import { OpportunitiesByStageChart } from '../components/OpportunitiesByStageChart';
 import { LeadsByStatusChart } from '../components/LeadsByStatusChart';
 
-interface DashboardProps {
-  onNavigate?: (path: string) => void;
-}
-
-export function Dashboard({ onNavigate }: DashboardProps) {
+export function Dashboard() {
+  const router = useRouter();
   const { Page, Card, Button, Alert, Spinner } = useUi();
 
-  const navigate = (path: string) => {
-    if (onNavigate) {
-      onNavigate(path);
-    } else if (typeof window !== 'undefined') {
-      window.location.href = path;
-    }
-  };
+  const navigate = (path: string) => router.push(path);
 
   return (
     <Page
@@ -42,7 +34,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     >
       {/* Summary Cards - Leads, Opportunities, Contacts, Accounts, Activities */}
       <div className="mb-6">
-        <SummaryCards onNavigate={onNavigate} />
+        <SummaryCards />
       </div>
 
       {/* Pipeline Metrics - Pipeline Value, Won Value, Recent Conversions */}

@@ -80,6 +80,7 @@ export function ActivityFeed({ limit = 15 }: ActivityFeedProps) {
                   )}
                   {formatDate(activity.createdOnTimestamp.toString())}
                 </div>
+
               </div>
             </li>
           ))}
@@ -88,4 +89,5 @@ export function ActivityFeed({ limit = 15 }: ActivityFeedProps) {
     </div>
   );
 }
+
 

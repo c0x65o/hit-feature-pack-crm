@@ -247,7 +247,6 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
                   : 'N/A',
               }))}
               loading={contactsLoading}
-              onRefresh={refetchContacts}
               onRowClick={(row) => {
                 navigate(`/crm/contacts/${String(row.id)}`);
               }}

@@ -322,12 +322,32 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
                 onChange={(value) => setFormData({ ...formData, order: parseInt(value) || 1 })}
                 required
               />
-              <Input
-                label="Color"
-                type="color"
-                value={formData.color}
-                onChange={(value) => setFormData({ ...formData, color: value })}
-              />
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '14px', 
+                  fontWeight: 500, 
+                  color: 'var(--hit-foreground)',
+                  marginBottom: '8px',
+                }}>
+                  Color
+                </label>
+                <input
+                  type="color"
+                  value={formData.color}
+                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    padding: '4px',
+                    backgroundColor: 'var(--hit-input-bg)',
+                    border: '1px solid var(--hit-input-border)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>

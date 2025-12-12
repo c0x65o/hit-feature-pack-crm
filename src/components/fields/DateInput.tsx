@@ -31,7 +31,6 @@ export function DateInput({
   min,
   max,
 }: DateInputProps) {
-  const { Input } = useUi();
   const [dateValue, setDateValue] = useState('');
 
   // Convert value to YYYY-MM-DD format for HTML5 date input
@@ -56,7 +55,8 @@ export function DateInput({
     }
   }, [value]);
 
-  const handleChange = (inputValue: string) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
     setDateValue(inputValue);
 
     if (inputValue === '') {
@@ -76,17 +76,51 @@ export function DateInput({
   };
 
   return (
-    <Input
-      label={label}
-      type="date"
-      value={dateValue}
-      onChange={handleChange}
-      placeholder={placeholder}
-      error={error}
-      required={required}
-      disabled={disabled}
-      min={min}
-      max={max}
-    />
+    <div>
+      {label && (
+        <label style={{ 
+          display: 'block', 
+          fontSize: '14px', 
+          fontWeight: 500, 
+          color: 'var(--hit-foreground)',
+          marginBottom: '8px',
+        }}>
+          {label}
+          {required && <span style={{ color: 'var(--hit-error)', marginLeft: '4px' }}>*</span>}
+        </label>
+      )}
+      <input
+        type="date"
+        value={dateValue}
+        onChange={handleChange}
+        placeholder={placeholder}
+        required={required}
+        disabled={disabled}
+        min={min}
+        max={max}
+        style={{
+          width: '100%',
+          padding: '8px 12px',
+          backgroundColor: 'var(--hit-input-bg)',
+          border: `1px solid ${error ? 'var(--hit-error)' : 'var(--hit-input-border)'}`,
+          borderRadius: '6px',
+          color: 'var(--hit-foreground)',
+          fontSize: '14px',
+          outline: 'none',
+          opacity: disabled ? 0.5 : 1,
+          cursor: disabled ? 'not-allowed' : 'text',
+          boxSizing: 'border-box',
+        }}
+      />
+      {error && (
+        <p style={{ 
+          marginTop: '4px', 
+          fontSize: '12px', 
+          color: 'var(--hit-error)',
+        }}>
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

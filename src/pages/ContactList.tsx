@@ -83,7 +83,6 @@ export function ContactList({ onNavigate }: ContactListProps) {
             ]}
             data={data?.items || []}
             loading={loading}
-            onRefresh={refetch}
             onRowClick={(row) => {
               navigate(`/crm/contacts/${String(row.id)}`);
             }}

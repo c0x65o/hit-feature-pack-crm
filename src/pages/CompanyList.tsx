@@ -83,7 +83,6 @@ export function CompanyList({ onNavigate }: CompanyListProps) {
             ]}
             data={data?.items || []}
             loading={loading}
-            onRefresh={refetch}
             onRowClick={(row) => {
               navigate(`/crm/companies/${String(row.id)}`);
             }}

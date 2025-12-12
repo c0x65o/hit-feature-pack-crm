@@ -108,7 +108,6 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
               },
             ]}
             data={data?.items || []}
-            onRefresh={refetch}
             onRowClick={(row) => navigate(`/crm/deals/${String(row.id)}`)}
           />
         )}

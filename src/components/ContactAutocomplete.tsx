@@ -20,13 +20,12 @@ export function ContactAutocomplete({
   placeholder = 'Search for a contact...',
   disabled = false,
 }: ContactAutocompleteProps) {
-  const { Input } = useUi();
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedContact, setSelectedContact] = useState<{ id: string; name: string } | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -108,10 +107,11 @@ export function ContactAutocomplete({
     onChange(contact.id);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
-    inputRef.current?.querySelector('input')?.blur();
+    inputRef.current?.blur();
   };
 
-  const handleInputChange = (newValue: string) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
     setSearchQuery(newValue);
     if (!newValue) {
       setSelectedContact(null);
@@ -125,7 +125,7 @@ export function ContactAutocomplete({
     onChange('');
     setShowSuggestions(false);
     setHighlightedIndex(-1);
-    inputRef.current?.querySelector('input')?.focus();
+    inputRef.current?.focus();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -150,7 +150,7 @@ export function ContactAutocomplete({
         e.preventDefault();
         setShowSuggestions(false);
         setHighlightedIndex(-1);
-        inputRef.current?.querySelector('input')?.blur();
+        inputRef.current?.blur();
         break;
     }
   };
@@ -176,9 +176,21 @@ export function ContactAutocomplete({
             ×
           </button>
         )}
-        <div ref={inputRef}>
-          <Input
-            label={label}
+        <div>
+          {label && (
+            <label style={{ 
+              display: 'block', 
+              fontSize: '14px', 
+              fontWeight: 500, 
+              color: 'var(--hit-foreground)',
+              marginBottom: '8px',
+            }}>
+              {label}
+            </label>
+          )}
+          <input
+            ref={inputRef}
+            type="text"
             value={searchQuery}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -188,6 +200,19 @@ export function ContactAutocomplete({
             aria-expanded={showSuggestions}
             aria-controls="contact-autocomplete-list"
             aria-activedescendant={highlightedIndex >= 0 ? `contact-option-${highlightedIndex}` : undefined}
+            style={{
+              width: '100%',
+              padding: '8px 12px',
+              backgroundColor: 'var(--hit-input-bg)',
+              border: '1px solid var(--hit-input-border)',
+              borderRadius: '6px',
+              color: 'var(--hit-foreground)',
+              fontSize: '14px',
+              outline: 'none',
+              opacity: disabled ? 0.5 : 1,
+              cursor: disabled ? 'not-allowed' : 'text',
+              boxSizing: 'border-box',
+            }}
           />
         </div>
       </div>

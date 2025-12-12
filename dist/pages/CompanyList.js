@@ -50,7 +50,7 @@ export function CompanyList({ onNavigate }) {
                                         setDeleteConfirm({ id: String(row.id), name: String(row.name) });
                                     }, children: _jsx(Trash2, { size: 16, style: { color: 'var(--hit-error, #ef4444)' } }) }) })),
                         },
-                    ], data: data?.items || [], loading: loading, onRefresh: refetch, onRowClick: (row) => {
+                    ], data: data?.items || [], loading: loading, onRowClick: (row) => {
                         navigate(`/crm/companies/${String(row.id)}`);
                     } })) }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Company", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deleteConfirm.name, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) }))] }));
 }

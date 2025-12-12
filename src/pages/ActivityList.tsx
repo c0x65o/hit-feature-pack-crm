@@ -85,7 +85,6 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
               },
             ]}
             data={data || []}
-            onRefresh={refetch}
             onRowClick={(row) => navigate(`/crm/activities/${String(row.id)}`)}
           />
         )}

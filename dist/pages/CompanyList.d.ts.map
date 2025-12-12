@@ -1,1 +1,1 @@
-{"version":3,"file":"CompanyList.d.ts","sourceRoot":"","sources":["../../src/pages/CompanyList.tsx"],"names":[],"mappings":"AAOA,UAAU,gBAAgB;IACxB,UAAU,CAAC,EAAE,CAAC,IAAI,EAAE,MAAM,KAAK,IAAI,CAAC;CACrC;AAED,wBAAgB,WAAW,CAAC,EAAE,UAAU,EAAE,EAAE,gBAAgB,2CAyG3D;AAED,eAAe,WAAW,CAAC"}
+{"version":3,"file":"CompanyList.d.ts","sourceRoot":"","sources":["../../src/pages/CompanyList.tsx"],"names":[],"mappings":"AAOA,UAAU,gBAAgB;IACxB,UAAU,CAAC,EAAE,CAAC,IAAI,EAAE,MAAM,KAAK,IAAI,CAAC;CACrC;AAED,wBAAgB,WAAW,CAAC,EAAE,UAAU,EAAE,EAAE,gBAAgB,2CAwG3D;AAED,eAAe,WAAW,CAAC"}

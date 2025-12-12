@@ -4,6 +4,9 @@
  * Implements role-based permissions:
  * - Salesperson: Read/write access limited to own records, read-only for companies, personal metrics only
  * - Sales Manager: Full read/write/delete access to all CRM objects, all metrics/reports
+ *
+ * Note: Delete permissions are currently unrestricted for all authenticated users.
+ * Proper permission logic should be implemented via the permission manager.
  */
 /**
  * Check if user has a specific role
@@ -77,11 +80,11 @@ export function canWriteRecord(user, recordOwnerId) {
 }
 /**
  * Check if user can delete a record
- * - Salesperson: Cannot delete (read-only except for own writes)
- * - Sales Manager: Can delete all records
+ * Note: Currently allows all authenticated users to delete.
+ * Proper permission logic should be implemented via the permission manager.
  */
 export function canDeleteRecord(user) {
-    return isSalesManager(user); // Only sales managers can delete
+    return true; // Allow all authenticated users for now
 }
 /**
  * Check if user can access metrics/reports
@@ -151,8 +154,10 @@ export function assertCanWrite(user, recordOwnerId) {
     }
 }
 export function assertCanDelete(user) {
-    if (!canDeleteRecord(user)) {
-        throw new Error("Insufficient permissions to delete records");
+    // Currently allows all authenticated users
+    // Proper permission logic should be implemented via the permission manager
+    if (!user) {
+        throw new Error("Unauthorized");
     }
 }
 export function assertCanAccessMetrics(user, metricsType) {

@@ -11,6 +11,7 @@ export declare function useCrmContacts(options?: UseCrmContactsOptions): {
     error: Error | null;
     createContact: (contact: any) => Promise<any>;
     updateContact: (id: string, contact: any) => Promise<any>;
+    refetch: () => Promise<void>;
 };
 export {};
 //# sourceMappingURL=useCrmContacts.d.ts.map

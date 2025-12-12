@@ -16,7 +16,7 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
   const companyId = id === 'new' ? undefined : id;
   const { Page, Card, Spinner, Alert, Button, DataTable } = useUi();
   const { data: company, loading } = useCrmCompanies({ id: companyId });
-  const { data: contactsData, loading: contactsLoading } = useCrmContacts({
+  const { data: contactsData, loading: contactsLoading, refetch: refetchContacts } = useCrmContacts({
     companyId: companyId,
     pageSize: 1000,
   });
@@ -179,6 +179,8 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
                   ? formatPhoneNumber(contact.phone, contact.country || 'US')
                   : 'N/A',
               }))}
+              loading={contactsLoading}
+              onRefresh={refetchContacts}
               onRowClick={(row) => {
                 navigate(`/crm/contacts/${row.id}`);
               }}

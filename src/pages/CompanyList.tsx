@@ -7,7 +7,7 @@ import { useCrmCompanies } from '../hooks/useCrmCompanies';
 
 export function CompanyList() {
   const { Page, Card, Button, DataTable, Spinner } = useUi();
-  const { data, loading } = useCrmCompanies({});
+  const { data, loading, refetch } = useCrmCompanies({});
 
   return (
     <Page
@@ -32,6 +32,8 @@ export function CompanyList() {
               { key: 'companyPhone', label: 'Phone' },
             ]}
             data={data?.items || []}
+            loading={loading}
+            onRefresh={refetch}
             onRowClick={(row) => {
               window.location.href = `/crm/companies/${row.id}`;
             }}

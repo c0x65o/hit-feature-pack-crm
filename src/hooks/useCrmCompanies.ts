@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface UseCrmCompaniesOptions {
   id?: string;
@@ -14,31 +14,32 @@ export function useCrmCompanies(options: UseCrmCompaniesOptions = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        let url = options.id
-          ? `/api/crm/companies/${options.id}`
-          : `/api/crm/companies?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
-        
-        if (options.search && !options.id) {
-          url += `&search=${encodeURIComponent(options.search)}`;
-        }
-        
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch companies');
-        const json = await res.json();
-        setData(options.id ? json : json);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      let url = options.id
+        ? `/api/crm/companies/${options.id}`
+        : `/api/crm/companies?page=${options.page || 1}&pageSize=${options.pageSize || 25}`;
+      
+      if (options.search && !options.id) {
+        url += `&search=${encodeURIComponent(options.search)}`;
       }
-    };
-
-    fetchData();
+      
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch companies');
+      const json = await res.json();
+      setData(options.id ? json : json);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
+    }
   }, [options.id, options.page, options.pageSize, options.search]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const createCompany = async (company: any) => {
     const res = await fetch('/api/crm/companies', {
@@ -60,6 +61,6 @@ export function useCrmCompanies(options: UseCrmCompaniesOptions = {}) {
     return res.json();
   };
 
-  return { data, loading, error, createCompany, updateCompany };
+  return { data, loading, error, createCompany, updateCompany, refetch: fetchData };
 }
 

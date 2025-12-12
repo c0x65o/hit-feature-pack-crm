@@ -9,7 +9,7 @@ export function CompanyDetail({ id, onNavigate }) {
     const companyId = id === 'new' ? undefined : id;
     const { Page, Card, Spinner, Alert, Button, DataTable } = useUi();
     const { data: company, loading } = useCrmCompanies({ id: companyId });
-    const { data: contactsData, loading: contactsLoading } = useCrmContacts({
+    const { data: contactsData, loading: contactsLoading, refetch: refetchContacts } = useCrmContacts({
         companyId: companyId,
         pageSize: 1000,
     });
@@ -51,7 +51,7 @@ export function CompanyDetail({ id, onNavigate }) {
                                 phone: contact.phone
                                     ? formatPhoneNumber(contact.phone, contact.country || 'US')
                                     : 'N/A',
-                            })), onRowClick: (row) => {
+                            })), loading: contactsLoading, onRefresh: refetchContacts, onRowClick: (row) => {
                                 navigate(`/crm/contacts/${row.id}`);
                             } })) : (_jsxs("div", { className: "text-center py-8 text-gray-400", children: [_jsx("p", { children: "No contacts associated with this company." }), _jsx("div", { className: "mt-4", children: _jsx(Button, { variant: "primary", onClick: () => navigate(`/crm/contacts/new?companyId=${companyId}`), children: "Add First Contact" }) })] }))] }) })] }));
 }

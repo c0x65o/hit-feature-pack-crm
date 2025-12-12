@@ -7,7 +7,7 @@ import { useCrmContacts } from '../hooks/useCrmContacts';
 
 export function ContactList() {
   const { Page, Card, Button, DataTable, Spinner } = useUi();
-  const { data, loading } = useCrmContacts({});
+  const { data, loading, refetch } = useCrmContacts({});
 
   return (
     <Page
@@ -32,6 +32,8 @@ export function ContactList() {
               { key: 'title', label: 'Title' },
             ]}
             data={data?.items || []}
+            loading={loading}
+            onRefresh={refetch}
             onRowClick={(row) => {
               window.location.href = `/crm/contacts/${row.id}`;
             }}

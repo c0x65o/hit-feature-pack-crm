@@ -1,44 +1,45 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 export function useCrmContacts(options = {}) {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                let url;
-                if (options.id) {
-                    url = `/api/crm/contacts/${options.id}`;
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            let url;
+            if (options.id) {
+                url = `/api/crm/contacts/${options.id}`;
+            }
+            else {
+                const params = new URLSearchParams();
+                params.set('page', String(options.page || 1));
+                params.set('pageSize', String(options.pageSize || 25));
+                if (options.search) {
+                    params.set('search', options.search);
                 }
-                else {
-                    const params = new URLSearchParams();
-                    params.set('page', String(options.page || 1));
-                    params.set('pageSize', String(options.pageSize || 25));
-                    if (options.search) {
-                        params.set('search', options.search);
-                    }
-                    if (options.companyId) {
-                        params.set('companyId', options.companyId);
-                    }
-                    url = `/api/crm/contacts?${params.toString()}`;
+                if (options.companyId) {
+                    params.set('companyId', options.companyId);
                 }
-                const res = await fetch(url);
-                if (!res.ok)
-                    throw new Error('Failed to fetch contacts');
-                const json = await res.json();
-                setData(options.id ? json : json);
+                url = `/api/crm/contacts?${params.toString()}`;
             }
-            catch (err) {
-                setError(err instanceof Error ? err : new Error('Unknown error'));
-            }
-            finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+            const res = await fetch(url);
+            if (!res.ok)
+                throw new Error('Failed to fetch contacts');
+            const json = await res.json();
+            setData(options.id ? json : json);
+            setError(null);
+        }
+        catch (err) {
+            setError(err instanceof Error ? err : new Error('Unknown error'));
+        }
+        finally {
+            setLoading(false);
+        }
     }, [options.id, options.page, options.pageSize, options.search, options.companyId]);
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
     const createContact = async (contact) => {
         const res = await fetch('/api/crm/contacts', {
             method: 'POST',
@@ -65,6 +66,6 @@ export function useCrmContacts(options = {}) {
         }
         return res.json();
     };
-    return { data, loading, error, createContact, updateContact };
+    return { data, loading, error, createContact, updateContact, refetch: fetchData };
 }
 //# sourceMappingURL=useCrmContacts.js.map

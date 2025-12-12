@@ -77,6 +77,18 @@ export function useCrmContacts(options: UseCrmContactsOptions = {}) {
     return res.json();
   };
 
-  return { data, loading, error, createContact, updateContact, refetch: fetchData };
+  const deleteContact = async (id: string) => {
+    const res = await fetch(`/api/crm/contacts/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || `Failed to delete contact (${res.status})`;
+      throw new Error(errorMessage);
+    }
+    return res.json();
+  };
+
+  return { data, loading, error, createContact, updateContact, deleteContact, refetch: fetchData };
 }
 

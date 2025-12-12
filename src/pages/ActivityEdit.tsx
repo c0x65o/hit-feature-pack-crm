@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 import { ContactAutocomplete } from '../components/ContactAutocomplete';
@@ -24,8 +25,8 @@ const ACTIVITY_TYPES = [
 
 export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEditProps) {
   const activityId = id === 'new' ? undefined : id;
-  const { Page, Card, Input, Button, Select, Spinner, TextArea } = useUi();
-  const { data: activityData, loading, createActivity, updateActivity } = useCrmActivities({ id: activityId });
+  const { Page, Card, Input, Button, Select, Spinner, TextArea, Modal } = useUi();
+  const { data: activityData, loading, createActivity, updateActivity, deleteActivity } = useCrmActivities({ id: activityId });
   // Hook returns array - get first item when fetching by ID
   const activity = activityData && activityData.length > 0 ? activityData[0] : null;
 
@@ -36,6 +37,8 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
   const [relatedContactId, setRelatedContactId] = useState(contactId || '');
   const [relatedDealId, setRelatedDealId] = useState(dealId || '');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (activity) {
@@ -90,12 +93,41 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
     }
   };
 
+  const handleDelete = async () => {
+    if (!activityId) return;
+    setIsDeleting(true);
+    try {
+      await deleteActivity(activityId);
+      navigate('/crm/activities');
+    } catch (error: any) {
+      console.error('Failed to delete activity:', error);
+      alert(error?.message || 'Failed to delete activity');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   if (loading && activityId) {
     return <Spinner />;
   }
 
   return (
-    <Page title={activityId ? 'Edit Activity' : 'New Activity'}>
+    <Page 
+      title={activityId ? 'Edit Activity' : 'New Activity'}
+      actions={
+        activityId ? (
+          <Button 
+            variant="danger" 
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isDeleting}
+          >
+            <Trash2 size={16} className="mr-2" />
+            Delete
+          </Button>
+        ) : undefined
+      }
+    >
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Select
@@ -146,6 +178,28 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
           </div>
         </form>
       </Card>
+
+      {showDeleteConfirm && (
+        <Modal
+          open={true}
+          onClose={() => setShowDeleteConfirm(false)}
+          title="Delete Activity"
+        >
+          <div style={{ padding: '16px' }}>
+            <p style={{ marginBottom: '16px' }}>
+              Are you sure you want to delete this activity? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </Page>
   );
 }

@@ -1,14 +1,19 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useRouter } from 'next/navigation';
 import { Target, TrendingUp, Users, Briefcase, Activity } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmMetrics } from '../hooks/useCrmMetrics';
-export function SummaryCards() {
-    const router = useRouter();
+export function SummaryCards({ onNavigate }) {
     const { Card, Button } = useUi();
     const { data: metrics, loading } = useCrmMetrics();
-    const navigate = (path) => router.push(path);
+    const navigate = (path) => {
+        if (onNavigate) {
+            onNavigate(path);
+        }
+        else if (typeof window !== 'undefined') {
+            window.location.href = path;
+        }
+    };
     if (loading || !metrics) {
         return null;
     }

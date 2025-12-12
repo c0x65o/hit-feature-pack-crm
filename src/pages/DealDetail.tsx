@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { DealHeader } from '../components/DealHeader';
@@ -13,8 +14,10 @@ interface DealDetailProps {
 
 export function DealDetail({ id, onNavigate }: DealDetailProps) {
   const dealId = id === 'new' ? undefined : id;
-  const { Page, Spinner, Alert } = useUi();
-  const { data: deal, loading } = useCrmDeals({ id: dealId });
+  const { Page, Spinner, Alert, Button, Modal } = useUi();
+  const { data: deal, loading, deleteDeal } = useCrmDeals({ id: dealId });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (loading) {
     return <Spinner />;
@@ -28,10 +31,72 @@ export function DealDetail({ id, onNavigate }: DealDetailProps) {
     );
   }
 
+  const navigate = (path: string) => {
+    if (onNavigate) {
+      onNavigate(path);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = path;
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!dealId) return;
+    setIsDeleting(true);
+    try {
+      await deleteDeal(dealId);
+      navigate('/crm/deals');
+    } catch (error: any) {
+      console.error('Failed to delete deal:', error);
+      alert(error?.message || 'Failed to delete deal');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
-    <Page title={deal.dealName}>
+    <Page 
+      title={deal.dealName}
+      actions={
+        <>
+          <Button variant="primary" onClick={() => navigate(`/crm/deals/${dealId}/edit`)}>
+            Edit Deal
+          </Button>
+          <Button 
+            variant="danger" 
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isDeleting}
+          >
+            <Trash2 size={16} className="mr-2" />
+            Delete
+          </Button>
+        </>
+      }
+    >
       <DealHeader deal={deal} />
       <ActivityLog dealId={dealId || ''} />
+
+      {showDeleteConfirm && (
+        <Modal
+          open={true}
+          onClose={() => setShowDeleteConfirm(false)}
+          title="Delete Deal"
+        >
+          <div style={{ padding: '16px' }}>
+            <p style={{ marginBottom: '16px' }}>
+              Are you sure you want to delete "{deal.dealName}"? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </Page>
   );
 }

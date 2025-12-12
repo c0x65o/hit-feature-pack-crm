@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface UseCrmDealsOptions {
   id?: string;
@@ -15,35 +15,36 @@ export function useCrmDeals(options: UseCrmDealsOptions = {}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        let url: string;
-        if (options.id) {
-          url = `/api/crm/deals/${options.id}`;
-        } else {
-          const params = new URLSearchParams();
-          params.set('page', String(options.page || 1));
-          params.set('pageSize', String(options.pageSize || 25));
-          if (options.search) {
-            params.set('search', options.search);
-          }
-          url = `/api/crm/deals?${params.toString()}`;
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      let url: string;
+      if (options.id) {
+        url = `/api/crm/deals/${options.id}`;
+      } else {
+        const params = new URLSearchParams();
+        params.set('page', String(options.page || 1));
+        params.set('pageSize', String(options.pageSize || 25));
+        if (options.search) {
+          params.set('search', options.search);
         }
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Failed to fetch deals');
-        const json = await res.json();
-        setData(options.id ? json : json);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setLoading(false);
+        url = `/api/crm/deals?${params.toString()}`;
       }
-    };
-
-    fetchData();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch deals');
+      const json = await res.json();
+      setData(options.id ? json : json);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+    } finally {
+      setLoading(false);
+    }
   }, [options.id, options.page, options.pageSize, options.search]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const createDeal = async (deal: any) => {
     const res = await fetch('/api/crm/deals', {
@@ -65,6 +66,18 @@ export function useCrmDeals(options: UseCrmDealsOptions = {}) {
     return res.json();
   };
 
-  return { data, loading, error, createDeal, updateDeal };
+  const deleteDeal = async (id: string) => {
+    const res = await fetch(`/api/crm/deals/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || `Failed to delete deal (${res.status})`;
+      throw new Error(errorMessage);
+    }
+    return res.json();
+  };
+
+  return { data, loading, error, createDeal, updateDeal, deleteDeal, refetch: fetchData };
 }
 

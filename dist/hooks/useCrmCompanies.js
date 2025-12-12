@@ -50,6 +50,17 @@ export function useCrmCompanies(options = {}) {
             throw new Error('Failed to update company');
         return res.json();
     };
-    return { data, loading, error, createCompany, updateCompany, refetch: fetchData };
+    const deleteCompany = async (id) => {
+        const res = await fetch(`/api/crm/companies/${id}`, {
+            method: 'DELETE',
+        });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMessage = errorData.error || `Failed to delete company (${res.status})`;
+            throw new Error(errorMessage);
+        }
+        return res.json();
+    };
+    return { data, loading, error, createCompany, updateCompany, deleteCompany, refetch: fetchData };
 }
 //# sourceMappingURL=useCrmCompanies.js.map

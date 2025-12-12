@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { useCrmContacts } from '../hooks/useCrmContacts';
@@ -14,18 +15,52 @@ interface CompanyDetailProps {
 
 export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
   const companyId = id === 'new' ? undefined : id;
-  const { Page, Card, Spinner, Alert, Button, DataTable } = useUi();
-  const { data: company, loading } = useCrmCompanies({ id: companyId });
-  const { data: contactsData, loading: contactsLoading, refetch: refetchContacts } = useCrmContacts({
+  const { Page, Card, Spinner, Alert, Button, DataTable, Modal } = useUi();
+  const { data: company, loading, deleteCompany } = useCrmCompanies({ id: companyId });
+  const { data: contactsData, loading: contactsLoading, refetch: refetchContacts, deleteContact } = useCrmContacts({
     companyId: companyId,
     pageSize: 1000,
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteContactConfirm, setDeleteContactConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [isDeletingContact, setIsDeletingContact] = useState(false);
 
   const navigate = (path: string) => {
     if (onNavigate) {
       onNavigate(path);
     } else if (typeof window !== 'undefined') {
       window.location.href = path;
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!companyId) return;
+    setIsDeleting(true);
+    try {
+      await deleteCompany(companyId);
+      navigate('/crm/companies');
+    } catch (error: any) {
+      console.error('Failed to delete company:', error);
+      alert(error?.message || 'Failed to delete company');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleDeleteContact = async () => {
+    if (!deleteContactConfirm) return;
+    setIsDeletingContact(true);
+    try {
+      await deleteContact(deleteContactConfirm.id);
+      await refetchContacts();
+      setDeleteContactConfirm(null);
+    } catch (error: any) {
+      console.error('Failed to delete contact:', error);
+      alert(error?.message || 'Failed to delete contact');
+    } finally {
+      setIsDeletingContact(false);
     }
   };
 
@@ -57,9 +92,19 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
     <Page
       title={company.name}
       actions={
-        <Button variant="primary" onClick={() => navigate(`/crm/companies/${companyId}/edit`)}>
-          Edit Company
-        </Button>
+        <>
+          <Button variant="primary" onClick={() => navigate(`/crm/companies/${companyId}/edit`)}>
+            Edit Company
+          </Button>
+          <Button 
+            variant="danger" 
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isDeleting}
+          >
+            <Trash2 size={16} className="mr-2" />
+            Delete
+          </Button>
+        </>
       }
     >
       <Card>
@@ -172,6 +217,28 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
                 { key: 'title', label: 'Title' },
                 { key: 'email', label: 'Email' },
                 { key: 'phone', label: 'Phone' },
+                {
+                  key: 'actions',
+                  label: '',
+                  sortable: false,
+                  hideable: false,
+                  align: 'right',
+                  render: (_value, row) => (
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteContactConfirm({ id: String(row.id), name: String(row.name) });
+                        }}
+                        disabled={isDeletingContact}
+                      >
+                        <Trash2 size={16} style={{ color: 'var(--hit-error, #ef4444)' }} />
+                      </Button>
+                    </div>
+                  ),
+                },
               ]}
               data={contactsData.items.map((contact: any) => ({
                 ...contact,
@@ -182,7 +249,7 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
               loading={contactsLoading}
               onRefresh={refetchContacts}
               onRowClick={(row) => {
-                navigate(`/crm/contacts/${row.id}`);
+                navigate(`/crm/contacts/${String(row.id)}`);
               }}
             />
           ) : (
@@ -200,6 +267,55 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
           )}
         </div>
       </Card>
+
+      {showDeleteConfirm && (
+        <Modal
+          open={true}
+          onClose={() => setShowDeleteConfirm(false)}
+          title="Delete Company"
+        >
+          <div style={{ padding: '16px' }}>
+            <p style={{ marginBottom: '16px' }}>
+              Are you sure you want to delete "{company.name}"? This action cannot be undone.
+              {contactsData?.items && contactsData.items.length > 0 && (
+                <span style={{ display: 'block', marginTop: '8px', color: 'var(--hit-error, #ef4444)' }}>
+                  Warning: This company has {contactsData.items.length} associated contact{contactsData.items.length !== 1 ? 's' : ''}.
+                </span>
+              )}
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {deleteContactConfirm && (
+        <Modal
+          open={true}
+          onClose={() => setDeleteContactConfirm(null)}
+          title="Delete Contact"
+        >
+          <div style={{ padding: '16px' }}>
+            <p style={{ marginBottom: '16px' }}>
+              Are you sure you want to delete "{deleteContactConfirm.name}"? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setDeleteContactConfirm(null)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDeleteContact} disabled={isDeletingContact}>
+                {isDeletingContact ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </Page>
   );
 }

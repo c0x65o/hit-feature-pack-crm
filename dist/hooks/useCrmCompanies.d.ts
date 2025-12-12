@@ -10,6 +10,7 @@ export declare function useCrmCompanies(options?: UseCrmCompaniesOptions): {
     error: Error | null;
     createCompany: (company: any) => Promise<any>;
     updateCompany: (id: string, company: any) => Promise<any>;
+    deleteCompany: (id: string) => Promise<any>;
     refetch: () => Promise<void>;
 };
 export {};

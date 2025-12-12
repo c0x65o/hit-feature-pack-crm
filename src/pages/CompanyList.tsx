@@ -1,20 +1,49 @@
 'use client';
 
-import React from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 
-export function CompanyList() {
-  const { Page, Card, Button, DataTable, Spinner } = useUi();
-  const { data, loading, refetch } = useCrmCompanies({});
+interface CompanyListProps {
+  onNavigate?: (path: string) => void;
+}
+
+export function CompanyList({ onNavigate }: CompanyListProps) {
+  const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+  const { data, loading, refetch, deleteCompany } = useCrmCompanies({});
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const navigate = (path: string) => {
+    if (onNavigate) {
+      onNavigate(path);
+    } else if (typeof window !== 'undefined') {
+      window.location.href = path;
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    setIsDeleting(true);
+    try {
+      await deleteCompany(deleteConfirm.id);
+      await refetch();
+      setDeleteConfirm(null);
+    } catch (error: any) {
+      console.error('Failed to delete company:', error);
+      alert(error?.message || 'Failed to delete company');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <Page
       title="Companies"
       description="Manage companies"
       actions={
-        <Button variant="primary" onClick={() => window.location.href = '/crm/companies/new'}>
+        <Button variant="primary" onClick={() => navigate('/crm/companies/new')}>
           <Plus size={16} className="mr-2" />
           New Company
         </Button>
@@ -30,16 +59,59 @@ export function CompanyList() {
               { key: 'website', label: 'Website' },
               { key: 'companyEmail', label: 'Email' },
               { key: 'companyPhone', label: 'Phone' },
+              {
+                key: 'actions',
+                label: '',
+                sortable: false,
+                hideable: false,
+                align: 'right',
+                render: (_value, row) => (
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirm({ id: String(row.id), name: String(row.name) });
+                      }}
+                    >
+                      <Trash2 size={16} style={{ color: 'var(--hit-error, #ef4444)' }} />
+                    </Button>
+                  </div>
+                ),
+              },
             ]}
             data={data?.items || []}
             loading={loading}
             onRefresh={refetch}
             onRowClick={(row) => {
-              window.location.href = `/crm/companies/${row.id}`;
+              navigate(`/crm/companies/${String(row.id)}`);
             }}
           />
         )}
       </Card>
+
+      {deleteConfirm && (
+        <Modal
+          open={true}
+          onClose={() => setDeleteConfirm(null)}
+          title="Delete Company"
+        >
+          <div style={{ padding: '16px' }}>
+            <p style={{ marginBottom: '16px' }}>
+              Are you sure you want to delete "{deleteConfirm.name}"? This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <Button variant="secondary" onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </Page>
   );
 }

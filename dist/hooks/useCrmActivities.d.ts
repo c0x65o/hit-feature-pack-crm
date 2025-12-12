@@ -15,6 +15,8 @@ export declare function useCrmActivities(options?: UseCrmActivitiesOptions): {
     error: Error | null;
     createActivity: (activity: any) => Promise<any>;
     updateActivity: (id: string, activity: any) => Promise<any>;
+    deleteActivity: (id: string) => Promise<any>;
+    refetch: () => Promise<void>;
 };
 export {};
 //# sourceMappingURL=useCrmActivities.d.ts.map

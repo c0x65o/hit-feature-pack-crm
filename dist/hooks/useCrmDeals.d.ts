@@ -11,6 +11,8 @@ export declare function useCrmDeals(options?: UseCrmDealsOptions): {
     error: Error | null;
     createDeal: (deal: any) => Promise<any>;
     updateDeal: (id: string, deal: any) => Promise<any>;
+    deleteDeal: (id: string) => Promise<any>;
+    refetch: () => Promise<void>;
 };
 export {};
 //# sourceMappingURL=useCrmDeals.d.ts.map

@@ -1,1 +1,1 @@
-{"version":3,"file":"ActivityList.d.ts","sourceRoot":"","sources":["../../src/pages/ActivityList.tsx"],"names":[],"mappings":"AAOA,UAAU,iBAAiB;IACzB,UAAU,CAAC,EAAE,CAAC,IAAI,EAAE,MAAM,KAAK,IAAI,CAAC;CACrC;AAED,wBAAgB,YAAY,CAAC,EAAE,UAAU,EAAE,EAAE,iBAAiB,2CAwG7D;AAED,eAAe,YAAY,CAAC"}
+{"version":3,"file":"ActivityList.d.ts","sourceRoot":"","sources":["../../src/pages/ActivityList.tsx"],"names":[],"mappings":"AAOA,UAAU,iBAAiB;IACzB,UAAU,CAAC,EAAE,CAAC,IAAI,EAAE,MAAM,KAAK,IAAI,CAAC;CACrC;AAED,wBAAgB,YAAY,CAAC,EAAE,UAAU,EAAE,EAAE,iBAAiB,2CA8G7D;AAED,eAAe,YAAY,CAAC"}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Target, TrendingUp, Users, Briefcase, Activity } from 'lucide-react';
+import { Building, Users, TrendingUp } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmMetrics } from '../hooks/useCrmMetrics';
 
@@ -19,18 +19,11 @@ export function SummaryCards() {
 
   const cards = [
     {
-      label: 'Leads',
-      value: metrics.totals.leads,
-      icon: Target,
+      label: 'Companies',
+      value: metrics.totals.companies,
+      icon: Building,
       iconColor: 'text-blue-500',
-      path: '/crm/contacts', // Leads map to contacts in new CRM
-    },
-    {
-      label: 'Opportunities',
-      value: metrics.totals.opportunities,
-      icon: TrendingUp,
-      iconColor: 'text-green-500',
-      path: '/crm/deals', // Opportunities map to deals in new CRM
+      path: '/crm/companies',
     },
     {
       label: 'Contacts',
@@ -40,23 +33,16 @@ export function SummaryCards() {
       path: '/crm/contacts',
     },
     {
-      label: 'Accounts',
-      value: metrics.totals.accounts,
-      icon: Briefcase,
-      iconColor: 'text-orange-500',
-      path: '/crm/companies', // Accounts map to companies in new CRM
-    },
-    {
-      label: 'Activities',
-      value: metrics.totals.activities,
-      icon: Activity,
-      iconColor: 'text-cyan-500',
-      path: '/crm/activities',
+      label: 'Deals',
+      value: metrics.totals.deals,
+      icon: TrendingUp,
+      iconColor: 'text-green-500',
+      path: '/crm/deals',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {cards.map((card) => {
         const Icon = card.icon;
         return (

@@ -1,13 +1,14 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { KanbanView } from '../components/KanbanView';
 export function DealList({ onNavigate }) {
     const { Page, Button, Tabs } = useUi();
     const [view, setView] = useState('kanban');
+    const { refetch, loading } = useCrmDeals({});
     const navigate = (path) => {
         if (onNavigate) {
             onNavigate(path);
@@ -16,7 +17,7 @@ export function DealList({ onNavigate }) {
             window.location.href = path;
         }
     };
-    return (_jsx(Page, { title: "Deals", description: "Manage your sales pipeline", actions: _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/deals/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Deal"] }), children: _jsx(Tabs, { activeTab: view, onChange: (tabId) => setView(tabId), tabs: [
+    return (_jsx(Page, { title: "Deals", description: "Manage your sales pipeline", actions: _jsxs("div", { style: { display: 'flex', gap: '8px' }, children: [_jsxs(Button, { variant: "secondary", onClick: () => refetch(), disabled: loading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] }), _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/deals/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Deal"] })] }), children: _jsx(Tabs, { activeTab: view, onChange: (tabId) => setView(tabId), tabs: [
                 { id: 'kanban', label: 'Kanban', content: _jsx(KanbanView, {}) },
                 { id: 'list', label: 'List', content: _jsx(DealListView, { onNavigate: onNavigate }) },
             ] }) }));

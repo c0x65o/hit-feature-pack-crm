@@ -1,8 +1,10 @@
 interface MetricsData {
     totals: {
+        companies: number;
+        contacts: number;
+        deals: number;
         leads: number;
         opportunities: number;
-        contacts: number;
         accounts: number;
         activities: number;
     };
@@ -10,6 +12,11 @@ interface MetricsData {
         totalValue: number;
         wonValue: number;
     };
+    dealsWeekly: Array<{
+        week: string;
+        count: number;
+        totalAmount: number;
+    }>;
     leads: {
         byStatus: Array<{
             status: string;

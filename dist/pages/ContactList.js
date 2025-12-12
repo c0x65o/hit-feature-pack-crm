@@ -1,7 +1,7 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 export function ContactList({ onNavigate }) {
@@ -34,7 +34,7 @@ export function ContactList({ onNavigate }) {
             setIsDeleting(false);
         }
     };
-    return (_jsxs(Page, { title: "Contacts", description: "Manage your contacts", actions: _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/contacts/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Contact"] }), children: [_jsx(Card, { children: loading ? (_jsx(Spinner, {})) : (_jsx(DataTable, { columns: [
+    return (_jsxs(Page, { title: "Contacts", description: "Manage your contacts", actions: _jsxs("div", { style: { display: 'flex', gap: '8px' }, children: [_jsxs(Button, { variant: "secondary", onClick: () => refetch(), disabled: loading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] }), _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/contacts/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Contact"] })] }), children: [_jsx(Card, { children: loading ? (_jsx(Spinner, {})) : (_jsx(DataTable, { columns: [
                         { key: 'name', label: 'Name', sortable: true },
                         { key: 'email', label: 'Email', sortable: true },
                         { key: 'phone', label: 'Phone' },

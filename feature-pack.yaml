@@ -78,16 +78,16 @@ nav:
         icon: LayoutDashboard
         weight: 100
         showWhen: authenticated
-      - id: crm-contacts
-        label: Contacts
-        path: /crm/contacts
-        icon: User
-        weight: 110
-        showWhen: authenticated
       - id: crm-companies
         label: Companies
         path: /crm/companies
         icon: Building
+        weight: 110
+        showWhen: authenticated
+      - id: crm-contacts
+        label: Contacts
+        path: /crm/contacts
+        icon: User
         weight: 120
         showWhen: authenticated
       - id: crm-deals

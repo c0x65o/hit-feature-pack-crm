@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 
@@ -43,10 +43,16 @@ export function ContactList({ onNavigate }: ContactListProps) {
       title="Contacts"
       description="Manage your contacts"
       actions={
-        <Button variant="primary" onClick={() => navigate('/crm/contacts/new')}>
-          <Plus size={16} className="mr-2" />
-          New Contact
-        </Button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant="secondary" onClick={() => refetch()} disabled={loading}>
+            <RefreshCw size={16} className="mr-2" />
+            Refresh
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/crm/contacts/new')}>
+            <Plus size={16} className="mr-2" />
+            New Contact
+          </Button>
+        </div>
       }
     >
       <Card>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { KanbanView } from '../components/KanbanView';
@@ -13,6 +13,7 @@ interface DealListProps {
 export function DealList({ onNavigate }: DealListProps) {
   const { Page, Button, Tabs } = useUi();
   const [view, setView] = useState<'list' | 'kanban'>('kanban');
+  const { refetch, loading } = useCrmDeals({});
 
   const navigate = (path: string) => {
     if (onNavigate) {
@@ -27,10 +28,16 @@ export function DealList({ onNavigate }: DealListProps) {
       title="Deals"
       description="Manage your sales pipeline"
       actions={
-        <Button variant="primary" onClick={() => navigate('/crm/deals/new')}>
-          <Plus size={16} className="mr-2" />
-          New Deal
-        </Button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant="secondary" onClick={() => refetch()} disabled={loading}>
+            <RefreshCw size={16} className="mr-2" />
+            Refresh
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/crm/deals/new')}>
+            <Plus size={16} className="mr-2" />
+            New Deal
+          </Button>
+        </div>
       }
     >
       <Tabs

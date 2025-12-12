@@ -16,16 +16,16 @@ export const navContributions = [
         icon: 'LayoutDashboard',
       },
       {
-        id: 'crm-contacts',
-        label: 'Contacts',
-        path: '/crm/contacts',
-        icon: 'User',
-      },
-      {
         id: 'crm-companies',
         label: 'Companies',
         path: '/crm/companies',
         icon: 'Building',
+      },
+      {
+        id: 'crm-contacts',
+        label: 'Contacts',
+        path: '/crm/contacts',
+        icon: 'User',
       },
       {
         id: 'crm-deals',

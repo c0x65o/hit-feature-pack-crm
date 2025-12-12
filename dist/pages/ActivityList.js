@@ -1,7 +1,7 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RefreshCw } from 'lucide-react';
 import { useUi } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 export function ActivityList({ onNavigate }) {
@@ -34,7 +34,7 @@ export function ActivityList({ onNavigate }) {
             setIsDeleting(false);
         }
     };
-    return (_jsxs(Page, { title: "Activities", description: "View and manage activities", actions: _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/activities/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Activity"] }), children: [_jsx(Card, { children: loading ? (_jsx(Spinner, {})) : (_jsx(DataTable, { columns: [
+    return (_jsxs(Page, { title: "Activities", description: "View and manage activities", actions: _jsxs("div", { style: { display: 'flex', gap: '8px' }, children: [_jsxs(Button, { variant: "secondary", onClick: () => refetch(), disabled: loading, children: [_jsx(RefreshCw, { size: 16, className: "mr-2" }), "Refresh"] }), _jsxs(Button, { variant: "primary", onClick: () => navigate('/crm/activities/new'), children: [_jsx(Plus, { size: 16, className: "mr-2" }), "New Activity"] })] }), children: [_jsx(Card, { children: loading ? (_jsx(Spinner, {})) : (_jsx(DataTable, { columns: [
                         { key: 'activityType', label: 'Type' },
                         { key: 'taskDescription', label: 'Description' },
                         { key: 'taskDueDate', label: 'Due Date' },

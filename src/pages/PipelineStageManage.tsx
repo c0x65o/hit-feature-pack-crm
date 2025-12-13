@@ -504,17 +504,15 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(stage.id)}
-                      disabled={Boolean(stage.isSystem)}
                       style={{
                         background: 'none',
                         border: 'none',
-                        cursor: stage.isSystem ? 'not-allowed' : 'pointer',
+                        cursor: 'pointer',
                         padding: '4px',
-                        color: stage.isSystem ? 'var(--hit-muted-foreground)' : 'var(--hit-error, #ef4444)',
-                        opacity: stage.isSystem ? 0.5 : 1,
+                        color: 'var(--hit-error, #ef4444)',
                       }}
                       aria-label="Delete stage"
-                      title={stage.isSystem ? 'System stages cannot be deleted' : 'Delete stage'}
+                      title="Delete stage"
                     >
                       <Trash2 size={16} />
                     </button>

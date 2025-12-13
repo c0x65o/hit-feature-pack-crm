@@ -102,6 +102,12 @@ nav:
         icon: Activity
         weight: 140
         showWhen: authenticated
+      - id: crm-pipeline-stages
+        label: Pipeline Stages
+        path: /crm/pipeline-stages
+        icon: Workflow
+        weight: 150
+        showWhen: authenticated
 
 # Notification types this pack can emit
 notifications:

@@ -15,7 +15,7 @@ export * from './hooks/index';
 // Navigation config
 export { navContributions as nav } from './nav';
 // Schema exports - for projects to import into their schema
-export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, } from './schema/crm';
+export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, DEFAULT_CRM_PIPELINE_STAGES, } from './schema/crm';
 // Services
 export { parseActivityText } from './services/openai';
 export * from './services/rbac';

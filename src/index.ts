@@ -75,6 +75,7 @@ export {
   type InsertCrmWebhookConfig,
   type InsertCrmApiKey,
   type InsertCrmOpenaiKey,
+  DEFAULT_CRM_PIPELINE_STAGES,
 } from './schema/crm';
 
 // Services

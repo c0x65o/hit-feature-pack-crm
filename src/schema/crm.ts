@@ -105,10 +105,12 @@ export const crmPipelineStages = pgTable(
   "crm_pipeline_stages",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    code: varchar("code", { length: 50 }).notNull().unique(),
     name: varchar("name", { length: 100 }).notNull(),
     order: integer("order").notNull(),
     isClosedWon: boolean("is_closed_won").notNull().default(false),
     isClosedLost: boolean("is_closed_lost").notNull().default(false),
+    isSystem: boolean("is_system").notNull().default(false),
     customerConfig: jsonb("customer_config"), // Per-customer configuration (JSONB)
     // Audit fields
     createdByUserId: varchar("created_by_user_id", { length: 255 }).notNull(),
@@ -118,7 +120,7 @@ export const crmPipelineStages = pgTable(
   },
   (table) => ({
     orderIdx: index("crm_pipeline_stages_order_idx").on(table.order),
-    nameIdx: unique("crm_pipeline_stages_name_unique").on(table.name),
+    codeIdx: index("crm_pipeline_stages_code_idx").on(table.code),
   })
 );
 
@@ -375,4 +377,59 @@ export type UpdateCrmApiKey = Partial<Omit<InsertCrmApiKey, "id" | "createdByUse
 export type CrmOpenaiKey = typeof crmOpenaiKeys.$inferSelect;
 export type InsertCrmOpenaiKey = typeof crmOpenaiKeys.$inferInsert;
 export type UpdateCrmOpenaiKey = Partial<Omit<InsertCrmOpenaiKey, "id" | "createdByUserId" | "createdOnTimestamp">>;
+
+/**
+ * Default CRM pipeline stages to be seeded
+ * These are inserted via migration or API initialization
+ */
+export const DEFAULT_CRM_PIPELINE_STAGES: Omit<InsertCrmPipelineStage, "id" | "createdByUserId" | "createdOnTimestamp">[] = [
+  {
+    code: "lead",
+    name: "Lead",
+    order: 1,
+    isClosedWon: false,
+    isClosedLost: false,
+    isSystem: true,
+  },
+  {
+    code: "qualified",
+    name: "Qualified",
+    order: 2,
+    isClosedWon: false,
+    isClosedLost: false,
+    isSystem: true,
+  },
+  {
+    code: "proposal",
+    name: "Proposal",
+    order: 3,
+    isClosedWon: false,
+    isClosedLost: false,
+    isSystem: true,
+  },
+  {
+    code: "negotiation",
+    name: "Negotiation",
+    order: 4,
+    isClosedWon: false,
+    isClosedLost: false,
+    isSystem: true,
+  },
+  {
+    code: "closed_won",
+    name: "Closed Won",
+    order: 5,
+    isClosedWon: true,
+    isClosedLost: false,
+    isSystem: true,
+  },
+  {
+    code: "closed_lost",
+    name: "Closed Lost",
+    order: 6,
+    isClosedWon: false,
+    isClosedLost: true,
+    isSystem: true,
+  },
+];
 

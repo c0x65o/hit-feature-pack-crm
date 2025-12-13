@@ -3,16 +3,23 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useEffect } from 'react';
 import { useUi } from '@hit/ui-kit';
 import { ArrowUp, ArrowDown, Edit, Trash2, Plus, X } from 'lucide-react';
+function normalizeStageCode(input) {
+    return input
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+}
 export function PipelineStageManage({ onNavigate: _onNavigate }) {
     const { Page, Card, Button: UIButton, Spinner, Alert, Modal, Input, Select, Checkbox } = useUi();
     const [stages, setStages] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [initializing, setInitializing] = useState(false);
     const [editingStage, setEditingStage] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState(null);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [formData, setFormData] = useState({
+        code: '',
         name: '',
         order: 1,
         isClosedWon: false,
@@ -39,27 +46,10 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
             setLoading(false);
         }
     };
-    const initializeStages = async () => {
-        try {
-            setInitializing(true);
-            const res = await fetch('/api/crm/pipeline-stages/init', {
-                method: 'POST',
-            });
-            if (!res.ok)
-                throw new Error('Failed to initialize stages');
-            await fetchStages();
-        }
-        catch (error) {
-            console.error('Failed to initialize pipeline stages', error);
-            setError('Failed to initialize pipeline stages');
-        }
-        finally {
-            setInitializing(false);
-        }
-    };
     const handleCreate = () => {
         const maxOrder = stages.length > 0 ? Math.max(...stages.map(s => s.order)) : 0;
         setFormData({
+            code: '',
             name: '',
             order: maxOrder + 1,
             isClosedWon: false,
@@ -75,6 +65,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
     };
     const handleEdit = (stage) => {
         setFormData({
+            code: stage.code || '',
             name: stage.name,
             order: stage.order,
             isClosedWon: stage.isClosedWon,
@@ -92,6 +83,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
         setEditingStage(null);
         setIsCreating(false);
         setFormData({
+            code: '',
             name: '',
             order: 1,
             isClosedWon: false,
@@ -108,6 +100,12 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
             setError(null);
             if (!formData.name.trim()) {
                 setError('Stage name is required');
+                return;
+            }
+            // Code is required for create. If user leaves it blank, derive from name.
+            const derivedCode = normalizeStageCode(formData.code || formData.name);
+            if (!editingStage && !derivedCode) {
+                setError('Stage code is required');
                 return;
             }
             const customerConfig = {};
@@ -130,6 +128,9 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
                 isClosedLost: formData.isClosedLost,
                 customerConfig: Object.keys(customerConfig).length > 0 ? customerConfig : null,
             };
+            if (!editingStage) {
+                payload.code = derivedCode;
+            }
             let res;
             if (editingStage) {
                 res = await fetch(`/api/crm/pipeline-stages/${editingStage.id}`, {
@@ -222,7 +223,9 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
     if (loading) {
         return _jsx(Spinner, {});
     }
-    return (_jsxs(Page, { title: "Pipeline Stages", description: "Configure the stages your deals move through from initial contact to close", actions: stages.length === 0 ? (_jsx(UIButton, { variant: "primary", onClick: initializeStages, disabled: initializing, children: initializing ? 'Initializing...' : 'Initialize Default Stages' })) : !isCreating && !editingStage ? (_jsxs(UIButton, { variant: "primary", onClick: handleCreate, children: [_jsx(Plus, { size: 16, style: { marginRight: '8px' } }), "Add Stage"] })) : undefined, children: [error && (_jsx(Alert, { variant: "error", title: "Error", children: error })), (isCreating || editingStage) && (_jsx("div", { style: { marginBottom: '24px' }, children: _jsxs(Card, { children: [_jsxs("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }, children: [_jsx("h3", { style: { fontSize: '18px', fontWeight: 600 }, children: editingStage ? 'Edit Stage' : 'Create New Stage' }), _jsx("button", { onClick: handleCancel, style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Cancel", children: _jsx(X, { size: 20 }) })] }), _jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '16px' }, children: [_jsx(Input, { label: "Stage Name", value: formData.name, onChange: (value) => setFormData({ ...formData, name: value }), required: true }), _jsxs("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }, children: [_jsx(Input, { label: "Order", type: "number", value: formData.order.toString(), onChange: (value) => setFormData({ ...formData, order: parseInt(value) || 1 }), required: true }), _jsxs("div", { children: [_jsx("label", { style: {
+    return (_jsxs(Page, { title: "Pipeline Stages", description: "Configure the stages your deals move through from initial contact to close", actions: !isCreating && !editingStage ? (_jsxs(UIButton, { variant: "primary", onClick: handleCreate, children: [_jsx(Plus, { size: 16, style: { marginRight: '8px' } }), "Add Stage"] })) : undefined, children: [error && (_jsx(Alert, { variant: "error", title: "Error", children: error })), (isCreating || editingStage) && (_jsx("div", { style: { marginBottom: '24px' }, children: _jsxs(Card, { children: [_jsxs("div", { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }, children: [_jsx("h3", { style: { fontSize: '18px', fontWeight: 600 }, children: editingStage ? 'Edit Stage' : 'Create New Stage' }), _jsx("button", { onClick: handleCancel, style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Cancel", children: _jsx(X, { size: 20 }) })] }), _jsxs("div", { style: { display: 'flex', flexDirection: 'column', gap: '16px' }, children: [_jsx(Input, { label: "Stage Code", value: formData.code, onChange: (value) => setFormData({ ...formData, code: normalizeStageCode(value) }), placeholder: "e.g. qualified, closed_won", required: !editingStage, disabled: Boolean(editingStage) }), _jsx("p", { style: { marginTop: '-8px', fontSize: '12px', color: 'var(--hit-muted-foreground)' }, children: editingStage
+                                        ? 'Code is the identity and cannot be changed.'
+                                        : 'Stable identifier (lowercase, underscores).' }), _jsx(Input, { label: "Stage Name", value: formData.name, onChange: (value) => setFormData({ ...formData, name: value }), required: true }), _jsxs("div", { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }, children: [_jsx(Input, { label: "Order", type: "number", value: formData.order.toString(), onChange: (value) => setFormData({ ...formData, order: parseInt(value) || 1 }), required: true }), _jsxs("div", { children: [_jsx("label", { style: {
                                                         display: 'block',
                                                         fontSize: '14px',
                                                         fontWeight: 500,
@@ -249,11 +252,18 @@ export function PipelineStageManage({ onNavigate: _onNavigate }) {
                                                     isClosedLost: checked,
                                                     isClosedWon: checked ? false : formData.isClosedWon,
                                                 });
-                                            } })] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '8px' }, children: [_jsx(UIButton, { variant: "secondary", onClick: handleCancel, children: "Cancel" }), _jsxs(UIButton, { variant: "primary", onClick: handleSave, children: [editingStage ? 'Update' : 'Create', " Stage"] })] })] })] }) })), _jsxs(Card, { children: [stages.length === 0 ? (_jsxs("div", { className: "text-center py-12", children: [_jsx("p", { className: "mb-4", style: { color: 'var(--hit-foreground)' }, children: "No pipeline stages configured yet." }), _jsxs("p", { className: "text-sm mb-6", style: { color: 'var(--hit-muted-foreground)' }, children: ["Click \"Initialize Default Stages\" to create the standard sales pipeline:", _jsx("br", {}), _jsx("span", { className: "font-medium", children: "Lead \u2192 Qualified \u2192 Proposal \u2192 Negotiation \u2192 Closed Won / Closed Lost" })] }), _jsx(UIButton, { variant: "primary", onClick: initializeStages, disabled: initializing, children: initializing ? 'Initializing...' : 'Initialize Default Stages' })] })) : (_jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "grid grid-cols-7 gap-4 text-sm font-medium pb-3 border-b", style: { borderColor: 'var(--hit-border)', color: 'var(--hit-muted-foreground)' }, children: [_jsx("div", { children: "Order" }), _jsx("div", { children: "Stage Name" }), _jsx("div", { children: "Status" }), _jsx("div", { children: "Closed Won" }), _jsx("div", { children: "Closed Lost" }), _jsx("div", { children: "Config" }), _jsx("div", { children: "Actions" })] }), _jsx("div", { className: "space-y-2", children: sortedStages.map((stage, index) => (_jsxs("div", { className: "grid grid-cols-7 gap-4 py-3 px-4 rounded-lg border items-center", style: {
+                                            } })] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '8px' }, children: [_jsx(UIButton, { variant: "secondary", onClick: handleCancel, children: "Cancel" }), _jsxs(UIButton, { variant: "primary", onClick: handleSave, children: [editingStage ? 'Update' : 'Create', " Stage"] })] })] })] }) })), _jsxs(Card, { children: [stages.length === 0 ? (_jsxs("div", { className: "text-center py-12", children: [_jsx("p", { className: "mb-4", style: { color: 'var(--hit-foreground)' }, children: "No pipeline stages configured yet." }), _jsxs("p", { className: "text-sm", style: { color: 'var(--hit-muted-foreground)' }, children: ["Default pipeline stages should be seeded automatically via migration.", _jsx("br", {}), "If you see this message, please run database migrations."] })] })) : (_jsxs("div", { className: "space-y-4", children: [_jsxs("div", { className: "grid grid-cols-7 gap-4 text-sm font-medium pb-3 border-b", style: { borderColor: 'var(--hit-border)', color: 'var(--hit-muted-foreground)' }, children: [_jsx("div", { children: "Order" }), _jsx("div", { children: "Stage Name" }), _jsx("div", { children: "Status" }), _jsx("div", { children: "Closed Won" }), _jsx("div", { children: "Closed Lost" }), _jsx("div", { children: "Config" }), _jsx("div", { children: "Actions" })] }), _jsx("div", { className: "space-y-2", children: sortedStages.map((stage, index) => (_jsxs("div", { className: "grid grid-cols-7 gap-4 py-3 px-4 rounded-lg border items-center", style: {
                                         backgroundColor: 'var(--hit-muted)',
                                         borderColor: 'var(--hit-border)',
                                         borderLeft: `4px solid ${stage.customerConfig?.color || '#3b82f6'}`,
-                                    }, children: [_jsxs("div", { style: { color: 'var(--hit-foreground)', display: 'flex', alignItems: 'center', gap: '8px' }, children: [index > 0 && (_jsx("button", { onClick: () => handleReorder(stage.id, 'up'), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Move up", children: _jsx(ArrowUp, { size: 16 }) })), _jsx("span", { children: stage.order }), index < sortedStages.length - 1 && (_jsx("button", { onClick: () => handleReorder(stage.id, 'down'), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Move down", children: _jsx(ArrowDown, { size: 16 }) }))] }), _jsx("div", { className: "font-medium", style: { color: 'var(--hit-foreground)' }, children: stage.name }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedWon || stage.isClosedLost ? 'Final' : 'Active' }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedWon ? '✓' : '—' }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedLost ? '✓' : '—' }), _jsxs("div", { style: { fontSize: '12px', color: 'var(--hit-muted-foreground)' }, children: [stage.customerConfig?.probability !== undefined && `${stage.customerConfig.probability}%`, stage.customerConfig?.forecastCategory && ` • ${stage.customerConfig.forecastCategory}`] }), _jsxs("div", { style: { display: 'flex', gap: '8px' }, children: [_jsx("button", { onClick: () => handleEdit(stage), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Edit stage", children: _jsx(Edit, { size: 16 }) }), _jsx("button", { onClick: () => setDeleteConfirm(stage.id), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--hit-error, #ef4444)' }, "aria-label": "Delete stage", children: _jsx(Trash2, { size: 16 }) })] })] }, stage.id))) })] })), _jsx("div", { className: "pt-6 mt-6 border-t", style: { borderColor: 'var(--hit-border)' }, children: _jsxs("p", { className: "text-sm", style: { color: 'var(--hit-muted-foreground)' }, children: [_jsx("strong", { style: { color: 'var(--hit-foreground)' }, children: "Sales Workflow:" }), " When you create a deal, you'll assign it to a pipeline stage. Move deals through stages using the Kanban board view. Deals in \"Closed Won\" or \"Closed Lost\" stages are considered final."] }) })] }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Pipeline Stage", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this pipeline stage? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(UIButton, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(UIButton, { variant: "danger", onClick: () => handleDelete(deleteConfirm), children: "Delete" })] })] }) }))] }));
+                                    }, children: [_jsxs("div", { style: { color: 'var(--hit-foreground)', display: 'flex', alignItems: 'center', gap: '8px' }, children: [index > 0 && (_jsx("button", { onClick: () => handleReorder(stage.id, 'up'), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Move up", children: _jsx(ArrowUp, { size: 16 }) })), _jsx("span", { children: stage.order }), index < sortedStages.length - 1 && (_jsx("button", { onClick: () => handleReorder(stage.id, 'down'), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Move down", children: _jsx(ArrowDown, { size: 16 }) }))] }), _jsx("div", { className: "font-medium", style: { color: 'var(--hit-foreground)' }, children: stage.name }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedWon || stage.isClosedLost ? 'Final' : 'Active' }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedWon ? '✓' : '—' }), _jsx("div", { style: { color: 'var(--hit-muted-foreground)' }, children: stage.isClosedLost ? '✓' : '—' }), _jsxs("div", { style: { fontSize: '12px', color: 'var(--hit-muted-foreground)' }, children: [stage.customerConfig?.probability !== undefined && `${stage.customerConfig.probability}%`, stage.customerConfig?.forecastCategory && ` • ${stage.customerConfig.forecastCategory}`] }), _jsxs("div", { style: { display: 'flex', gap: '8px' }, children: [_jsx("button", { onClick: () => handleEdit(stage), style: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }, "aria-label": "Edit stage", children: _jsx(Edit, { size: 16 }) }), _jsx("button", { onClick: () => setDeleteConfirm(stage.id), disabled: Boolean(stage.isSystem), style: {
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        cursor: stage.isSystem ? 'not-allowed' : 'pointer',
+                                                        padding: '4px',
+                                                        color: stage.isSystem ? 'var(--hit-muted-foreground)' : 'var(--hit-error, #ef4444)',
+                                                        opacity: stage.isSystem ? 0.5 : 1,
+                                                    }, "aria-label": "Delete stage", title: stage.isSystem ? 'System stages cannot be deleted' : 'Delete stage', children: _jsx(Trash2, { size: 16 }) })] })] }, stage.id))) })] })), _jsx("div", { className: "pt-6 mt-6 border-t", style: { borderColor: 'var(--hit-border)' }, children: _jsxs("p", { className: "text-sm", style: { color: 'var(--hit-muted-foreground)' }, children: [_jsx("strong", { style: { color: 'var(--hit-foreground)' }, children: "Sales Workflow:" }), " When you create a deal, you'll assign it to a pipeline stage. Move deals through stages using the Kanban board view. Deals in \"Closed Won\" or \"Closed Lost\" stages are considered final."] }) })] }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Pipeline Stage", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this pipeline stage? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(UIButton, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(UIButton, { variant: "danger", onClick: () => handleDelete(deleteConfirm), children: "Delete" })] })] }) }))] }));
 }
 export default PipelineStageManage;
 //# sourceMappingURL=PipelineStageManage.js.map

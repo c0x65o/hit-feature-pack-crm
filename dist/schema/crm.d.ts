@@ -473,6 +473,18 @@ export declare const crmPipelineStages: import("drizzle-orm/pg-core").PgTableWit
             enumValues: undefined;
             baseColumn: never;
         }, {}, {}>;
+        code: import("drizzle-orm/pg-core").PgColumn<{
+            name: "code";
+            tableName: "crm_pipeline_stages";
+            dataType: "string";
+            columnType: "PgVarchar";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+        }, {}, {}>;
         name: import("drizzle-orm/pg-core").PgColumn<{
             name: "name";
             tableName: "crm_pipeline_stages";
@@ -511,6 +523,18 @@ export declare const crmPipelineStages: import("drizzle-orm/pg-core").PgTableWit
         }, {}, {}>;
         isClosedLost: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_closed_lost";
+            tableName: "crm_pipeline_stages";
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
+            notNull: true;
+            hasDefault: true;
+            enumValues: undefined;
+            baseColumn: never;
+        }, {}, {}>;
+        isSystem: import("drizzle-orm/pg-core").PgColumn<{
+            name: "is_system";
             tableName: "crm_pipeline_stages";
             dataType: "boolean";
             columnType: "PgBoolean";
@@ -1473,4 +1497,9 @@ export type UpdateCrmApiKey = Partial<Omit<InsertCrmApiKey, "id" | "createdByUse
 export type CrmOpenaiKey = typeof crmOpenaiKeys.$inferSelect;
 export type InsertCrmOpenaiKey = typeof crmOpenaiKeys.$inferInsert;
 export type UpdateCrmOpenaiKey = Partial<Omit<InsertCrmOpenaiKey, "id" | "createdByUserId" | "createdOnTimestamp">>;
+/**
+ * Default CRM pipeline stages to be seeded
+ * These are inserted via migration or API initialization
+ */
+export declare const DEFAULT_CRM_PIPELINE_STAGES: Omit<InsertCrmPipelineStage, "id" | "createdByUserId" | "createdOnTimestamp">[];
 //# sourceMappingURL=crm.d.ts.map

@@ -150,7 +150,8 @@ schema:
     InsertCrmPipelineStage,
     InsertCrmWebhookConfig,
     InsertCrmApiKey,
-    InsertCrmOpenaiKey
+    InsertCrmOpenaiKey,
+    DEFAULT_CRM_PIPELINE_STAGES
   ]
 
 # API routes the feature pack expects

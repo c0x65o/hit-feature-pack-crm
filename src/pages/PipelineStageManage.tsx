@@ -6,10 +6,12 @@ import { ArrowUp, ArrowDown, Edit, Trash2, Plus, X } from 'lucide-react';
 
 interface PipelineStage {
   id: string;
+  code: string;
   name: string;
   order: number;
   isClosedWon: boolean;
   isClosedLost: boolean;
+  isSystem?: boolean;
   customerConfig?: {
     color?: string;
     probability?: number;
@@ -19,6 +21,7 @@ interface PipelineStage {
 }
 
 interface StageFormData {
+  code: string;
   name: string;
   order: number;
   isClosedWon: boolean;
@@ -29,17 +32,25 @@ interface StageFormData {
   wipLimit: number | null;
 }
 
+function normalizeStageCode(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
 export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: (path: string) => void }) {
   const { Page, Card, Button: UIButton, Spinner, Alert, Modal, Input, Select, Checkbox } = useUi();
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [initializing, setInitializing] = useState(false);
   const [editingStage, setEditingStage] = useState<PipelineStage | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<StageFormData>({
+    code: '',
     name: '',
     order: 1,
     isClosedWon: false,
@@ -65,25 +76,10 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
     }
   };
 
-  const initializeStages = async () => {
-    try {
-      setInitializing(true);
-      const res = await fetch('/api/crm/pipeline-stages/init', {
-        method: 'POST',
-      });
-      if (!res.ok) throw new Error('Failed to initialize stages');
-      await fetchStages();
-    } catch (error) {
-      console.error('Failed to initialize pipeline stages', error);
-      setError('Failed to initialize pipeline stages');
-    } finally {
-      setInitializing(false);
-    }
-  };
-
   const handleCreate = () => {
     const maxOrder = stages.length > 0 ? Math.max(...stages.map(s => s.order)) : 0;
     setFormData({
+      code: '',
       name: '',
       order: maxOrder + 1,
       isClosedWon: false,
@@ -100,6 +96,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
 
   const handleEdit = (stage: PipelineStage) => {
     setFormData({
+      code: stage.code || '',
       name: stage.name,
       order: stage.order,
       isClosedWon: stage.isClosedWon,
@@ -118,6 +115,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
     setEditingStage(null);
     setIsCreating(false);
     setFormData({
+      code: '',
       name: '',
       order: 1,
       isClosedWon: false,
@@ -139,6 +137,13 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
         return;
       }
 
+      // Code is required for create. If user leaves it blank, derive from name.
+      const derivedCode = normalizeStageCode(formData.code || formData.name);
+      if (!editingStage && !derivedCode) {
+        setError('Stage code is required');
+        return;
+      }
+
       const customerConfig: any = {};
       if (formData.color && formData.color !== '#3b82f6') {
         customerConfig.color = formData.color;
@@ -153,13 +158,16 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
         customerConfig.wipLimit = formData.wipLimit;
       }
 
-      const payload = {
+      const payload: any = {
         name: formData.name.trim(),
         order: formData.order,
         isClosedWon: formData.isClosedWon,
         isClosedLost: formData.isClosedLost,
         customerConfig: Object.keys(customerConfig).length > 0 ? customerConfig : null,
       };
+      if (!editingStage) {
+        payload.code = derivedCode;
+      }
 
       let res;
       if (editingStage) {
@@ -265,15 +273,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
       title="Pipeline Stages"
       description="Configure the stages your deals move through from initial contact to close"
       actions={
-        stages.length === 0 ? (
-          <UIButton
-            variant="primary"
-            onClick={initializeStages}
-            disabled={initializing}
-          >
-            {initializing ? 'Initializing...' : 'Initialize Default Stages'}
-          </UIButton>
-        ) : !isCreating && !editingStage ? (
+        !isCreating && !editingStage ? (
           <UIButton
             variant="primary"
             onClick={handleCreate}
@@ -307,6 +307,19 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <Input
+              label="Stage Code"
+              value={formData.code}
+              onChange={(value) => setFormData({ ...formData, code: normalizeStageCode(value) })}
+              placeholder="e.g. qualified, closed_won"
+              required={!editingStage}
+              disabled={Boolean(editingStage)}
+            />
+            <p style={{ marginTop: '-8px', fontSize: '12px', color: 'var(--hit-muted-foreground)' }}>
+              {editingStage
+                ? 'Code is the identity and cannot be changed.'
+                : 'Stable identifier (lowercase, underscores).'}
+            </p>
             <Input
               label="Stage Name"
               value={formData.name}
@@ -418,18 +431,11 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
             <p className="mb-4" style={{ color: 'var(--hit-foreground)' }}>
               No pipeline stages configured yet.
             </p>
-            <p className="text-sm mb-6" style={{ color: 'var(--hit-muted-foreground)' }}>
-              Click "Initialize Default Stages" to create the standard sales pipeline:
+            <p className="text-sm" style={{ color: 'var(--hit-muted-foreground)' }}>
+              Default pipeline stages should be seeded automatically via migration.
               <br />
-              <span className="font-medium">Lead → Qualified → Proposal → Negotiation → Closed Won / Closed Lost</span>
+              If you see this message, please run database migrations.
             </p>
-            <UIButton
-              variant="primary"
-              onClick={initializeStages}
-              disabled={initializing}
-            >
-              {initializing ? 'Initializing...' : 'Initialize Default Stages'}
-            </UIButton>
           </div>
         ) : (
           <div className="space-y-4">
@@ -498,8 +504,17 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(stage.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--hit-error, #ef4444)' }}
+                      disabled={Boolean(stage.isSystem)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: stage.isSystem ? 'not-allowed' : 'pointer',
+                        padding: '4px',
+                        color: stage.isSystem ? 'var(--hit-muted-foreground)' : 'var(--hit-error, #ef4444)',
+                        opacity: stage.isSystem ? 0.5 : 1,
+                      }}
                       aria-label="Delete stage"
+                      title={stage.isSystem ? 'System stages cannot be deleted' : 'Delete stage'}
                     >
                       <Trash2 size={16} />
                     </button>

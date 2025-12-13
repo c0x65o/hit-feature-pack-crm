@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 import { ContactAutocomplete } from '../components/ContactAutocomplete';
 import { DealAutocomplete } from '../components/DealAutocomplete';
@@ -25,7 +25,8 @@ const ACTIVITY_TYPES = [
 
 export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEditProps) {
   const activityId = id === 'new' ? undefined : id;
-  const { Page, Card, Input, Button, Select, Spinner, TextArea, Modal } = useUi();
+  const { Page, Card, Input, Button, Select, Spinner, TextArea, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data: activityData, loading, createActivity, updateActivity, deleteActivity } = useCrmActivities({ id: activityId });
   // Hook returns array - get first item when fetching by ID
   const activity = activityData && activityData.length > 0 ? activityData[0] : null;
@@ -101,7 +102,10 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
       navigate('/crm/activities');
     } catch (error: any) {
       console.error('Failed to delete activity:', error);
-      alert(error?.message || 'Failed to delete activity');
+      await alertDialog.showAlert(error?.message || 'Failed to delete activity', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -200,6 +204,7 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }: ActivityEdit
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

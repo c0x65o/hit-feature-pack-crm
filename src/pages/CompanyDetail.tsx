@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { formatPhoneNumber } from '../utils/phone';
@@ -15,7 +15,8 @@ interface CompanyDetailProps {
 
 export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
   const companyId = id === 'new' ? undefined : id;
-  const { Page, Card, Spinner, Alert, Button, DataTable, Modal } = useUi();
+  const { Page, Card, Spinner, Alert, Button, DataTable, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data: company, loading, deleteCompany } = useCrmCompanies({ id: companyId });
   const { data: contactsData, loading: contactsLoading, refetch: refetchContacts, deleteContact } = useCrmContacts({
     companyId: companyId,
@@ -42,7 +43,10 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
       navigate('/crm/companies');
     } catch (error: any) {
       console.error('Failed to delete company:', error);
-      alert(error?.message || 'Failed to delete company');
+      await alertDialog.showAlert(error?.message || 'Failed to delete company', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -58,7 +62,10 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
       setDeleteContactConfirm(null);
     } catch (error: any) {
       console.error('Failed to delete contact:', error);
-      alert(error?.message || 'Failed to delete contact');
+      await alertDialog.showAlert(error?.message || 'Failed to delete contact', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeletingContact(false);
     }
@@ -315,6 +322,7 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 
 interface CompanyListProps {
@@ -10,7 +10,8 @@ interface CompanyListProps {
 }
 
 export function CompanyList({ onNavigate }: CompanyListProps) {
-  const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+  const { Page, Card, Button, DataTable, Spinner, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data, loading, refetch, deleteCompany } = useCrmCompanies({});
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,7 +33,10 @@ export function CompanyList({ onNavigate }: CompanyListProps) {
       setDeleteConfirm(null);
     } catch (error: any) {
       console.error('Failed to delete company:', error);
-      alert(error?.message || 'Failed to delete company');
+      await alertDialog.showAlert(error?.message || 'Failed to delete company', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -117,6 +121,7 @@ export function CompanyList({ onNavigate }: CompanyListProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

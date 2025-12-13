@@ -2,10 +2,11 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 export function ContactList({ onNavigate }) {
-    const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+    const { Page, Card, Button, DataTable, Spinner, Modal, AlertDialog } = useUi();
+    const alertDialog = useAlertDialog();
     const { data, loading, refetch, deleteContact } = useCrmContacts({});
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -28,7 +29,10 @@ export function ContactList({ onNavigate }) {
         }
         catch (error) {
             console.error('Failed to delete contact:', error);
-            alert(error?.message || 'Failed to delete contact');
+            await alertDialog.showAlert(error?.message || 'Failed to delete contact', {
+                variant: 'error',
+                title: 'Delete Failed'
+            });
         }
         finally {
             setIsDeleting(false);
@@ -52,7 +56,7 @@ export function ContactList({ onNavigate }) {
                         },
                     ], data: data?.items || [], loading: loading, onRowClick: (row) => {
                         navigate(`/crm/contacts/${String(row.id)}`);
-                    } })) }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Contact", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deleteConfirm.name, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) }))] }));
+                    } })) }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Contact", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deleteConfirm.name, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
 }
 export default ContactList;
 //# sourceMappingURL=ContactList.js.map

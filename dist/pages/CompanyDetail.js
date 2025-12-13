@@ -2,14 +2,15 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { formatPhoneNumber } from '../utils/phone';
 import { formatFullAddress } from '../utils/address';
 export function CompanyDetail({ id, onNavigate }) {
     const companyId = id === 'new' ? undefined : id;
-    const { Page, Card, Spinner, Alert, Button, DataTable, Modal } = useUi();
+    const { Page, Card, Spinner, Alert, Button, DataTable, Modal, AlertDialog } = useUi();
+    const alertDialog = useAlertDialog();
     const { data: company, loading, deleteCompany } = useCrmCompanies({ id: companyId });
     const { data: contactsData, loading: contactsLoading, refetch: refetchContacts, deleteContact } = useCrmContacts({
         companyId: companyId,
@@ -37,7 +38,10 @@ export function CompanyDetail({ id, onNavigate }) {
         }
         catch (error) {
             console.error('Failed to delete company:', error);
-            alert(error?.message || 'Failed to delete company');
+            await alertDialog.showAlert(error?.message || 'Failed to delete company', {
+                variant: 'error',
+                title: 'Delete Failed'
+            });
         }
         finally {
             setIsDeleting(false);
@@ -55,7 +59,10 @@ export function CompanyDetail({ id, onNavigate }) {
         }
         catch (error) {
             console.error('Failed to delete contact:', error);
-            alert(error?.message || 'Failed to delete contact');
+            await alertDialog.showAlert(error?.message || 'Failed to delete contact', {
+                variant: 'error',
+                title: 'Delete Failed'
+            });
         }
         finally {
             setIsDeletingContact(false);
@@ -104,7 +111,7 @@ export function CompanyDetail({ id, onNavigate }) {
                                     : 'N/A',
                             })), loading: contactsLoading, onRowClick: (row) => {
                                 navigate(`/crm/contacts/${String(row.id)}`);
-                            } })) : (_jsxs("div", { className: "text-center py-8 text-gray-400", children: [_jsx("p", { children: "No contacts associated with this company." }), _jsx("div", { className: "mt-4", children: _jsx(Button, { variant: "primary", onClick: () => navigate(`/crm/contacts/new?companyId=${companyId}`), children: "Add First Contact" }) })] }))] }) }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Company", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", company.name, "\"? This action cannot be undone.", contactsData?.items && contactsData.items.length > 0 && (_jsxs("span", { style: { display: 'block', marginTop: '8px', color: 'var(--hit-error, #ef4444)' }, children: ["Warning: This company has ", contactsData.items.length, " associated contact", contactsData.items.length !== 1 ? 's' : '', "."] }))] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), deleteContactConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteContactConfirm(null), title: "Delete Contact", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deleteContactConfirm.name, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteContactConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDeleteContact, disabled: isDeletingContact, children: isDeletingContact ? 'Deleting...' : 'Delete' })] })] }) }))] }));
+                            } })) : (_jsxs("div", { className: "text-center py-8 text-gray-400", children: [_jsx("p", { children: "No contacts associated with this company." }), _jsx("div", { className: "mt-4", children: _jsx(Button, { variant: "primary", onClick: () => navigate(`/crm/contacts/new?companyId=${companyId}`), children: "Add First Contact" }) })] }))] }) }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Company", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", company.name, "\"? This action cannot be undone.", contactsData?.items && contactsData.items.length > 0 && (_jsxs("span", { style: { display: 'block', marginTop: '8px', color: 'var(--hit-error, #ef4444)' }, children: ["Warning: This company has ", contactsData.items.length, " associated contact", contactsData.items.length !== 1 ? 's' : '', "."] }))] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), deleteContactConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteContactConfirm(null), title: "Delete Contact", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deleteContactConfirm.name, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteContactConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDeleteContact, disabled: isDeletingContact, children: isDeletingContact ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
 }
 export default CompanyDetail;
 //# sourceMappingURL=CompanyDetail.js.map

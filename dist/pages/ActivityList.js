@@ -2,10 +2,11 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 export function ActivityList({ onNavigate }) {
-    const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+    const { Page, Card, Button, DataTable, Spinner, Modal, AlertDialog } = useUi();
+    const alertDialog = useAlertDialog();
     const { data, loading, deleteActivity, refetch } = useCrmActivities({});
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -28,7 +29,10 @@ export function ActivityList({ onNavigate }) {
         }
         catch (error) {
             console.error('Failed to delete activity:', error);
-            alert(error?.message || 'Failed to delete activity');
+            await alertDialog.showAlert(error?.message || 'Failed to delete activity', {
+                variant: 'error',
+                title: 'Delete Failed'
+            });
         }
         finally {
             setIsDeleting(false);
@@ -53,7 +57,7 @@ export function ActivityList({ onNavigate }) {
                                         });
                                     }, children: _jsx(Trash2, { size: 16, style: { color: 'var(--hit-error, #ef4444)' } }) }) })),
                         },
-                    ], data: data || [], onRowClick: (row) => navigate(`/crm/activities/${String(row.id)}`) })) }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Activity", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this activity? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) }))] }));
+                    ], data: data || [], onRowClick: (row) => navigate(`/crm/activities/${String(row.id)}`) })) }), deleteConfirm && (_jsx(Modal, { open: true, onClose: () => setDeleteConfirm(null), title: "Delete Activity", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this activity? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setDeleteConfirm(null), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
 }
 export default ActivityList;
 //# sourceMappingURL=ActivityList.js.map

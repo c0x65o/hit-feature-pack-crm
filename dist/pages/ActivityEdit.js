@@ -2,7 +2,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 import { ContactAutocomplete } from '../components/ContactAutocomplete';
 import { DealAutocomplete } from '../components/DealAutocomplete';
@@ -16,7 +16,8 @@ const ACTIVITY_TYPES = [
 ];
 export function ActivityEdit({ id, contactId, dealId, onNavigate }) {
     const activityId = id === 'new' ? undefined : id;
-    const { Page, Card, Input, Button, Select, Spinner, TextArea, Modal } = useUi();
+    const { Page, Card, Input, Button, Select, Spinner, TextArea, Modal, AlertDialog } = useUi();
+    const alertDialog = useAlertDialog();
     const { data: activityData, loading, createActivity, updateActivity, deleteActivity } = useCrmActivities({ id: activityId });
     // Hook returns array - get first item when fetching by ID
     const activity = activityData && activityData.length > 0 ? activityData[0] : null;
@@ -91,7 +92,10 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }) {
         }
         catch (error) {
             console.error('Failed to delete activity:', error);
-            alert(error?.message || 'Failed to delete activity');
+            await alertDialog.showAlert(error?.message || 'Failed to delete activity', {
+                variant: 'error',
+                title: 'Delete Failed'
+            });
         }
         finally {
             setIsDeleting(false);
@@ -101,7 +105,7 @@ export function ActivityEdit({ id, contactId, dealId, onNavigate }) {
     if (loading && activityId) {
         return _jsx(Spinner, {});
     }
-    return (_jsxs(Page, { title: activityId ? 'Edit Activity' : 'New Activity', actions: activityId ? (_jsxs(Button, { variant: "danger", onClick: () => setShowDeleteConfirm(true), disabled: isDeleting, children: [_jsx(Trash2, { size: 16, className: "mr-2" }), "Delete"] })) : undefined, children: [_jsx(Card, { children: _jsxs("form", { onSubmit: handleSubmit, className: "space-y-6", children: [_jsx(Select, { label: "Activity Type", options: ACTIVITY_TYPES, value: activityType, onChange: setActivityType }), _jsx(TextArea, { label: "Note / Description", value: rawNoteText, onChange: setRawNoteText, placeholder: "Enter activity notes...", required: true, error: fieldErrors.rawNoteText, rows: 6 }), _jsx(DateInput, { label: "Task Due Date", value: taskDueDate, onChange: setTaskDueDate }), _jsx(Input, { label: "Task Description", value: taskDescription, onChange: setTaskDescription, placeholder: "Brief task description" }), _jsx(ContactAutocomplete, { label: "Related Contact", value: relatedContactId, onChange: setRelatedContactId, placeholder: "Search for a contact (optional)" }), _jsx(DealAutocomplete, { label: "Related Deal", value: relatedDealId, onChange: setRelatedDealId, placeholder: "Search for a deal (optional)" }), _jsxs("div", { className: "flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-gray-800", children: [_jsx(Button, { type: "button", variant: "secondary", onClick: () => navigate('/crm/activities'), children: "Cancel" }), _jsxs(Button, { type: "submit", variant: "primary", children: [activityId ? 'Update' : 'Create', " Activity"] })] })] }) }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Activity", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this activity? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) }))] }));
+    return (_jsxs(Page, { title: activityId ? 'Edit Activity' : 'New Activity', actions: activityId ? (_jsxs(Button, { variant: "danger", onClick: () => setShowDeleteConfirm(true), disabled: isDeleting, children: [_jsx(Trash2, { size: 16, className: "mr-2" }), "Delete"] })) : undefined, children: [_jsx(Card, { children: _jsxs("form", { onSubmit: handleSubmit, className: "space-y-6", children: [_jsx(Select, { label: "Activity Type", options: ACTIVITY_TYPES, value: activityType, onChange: setActivityType }), _jsx(TextArea, { label: "Note / Description", value: rawNoteText, onChange: setRawNoteText, placeholder: "Enter activity notes...", required: true, error: fieldErrors.rawNoteText, rows: 6 }), _jsx(DateInput, { label: "Task Due Date", value: taskDueDate, onChange: setTaskDueDate }), _jsx(Input, { label: "Task Description", value: taskDescription, onChange: setTaskDescription, placeholder: "Brief task description" }), _jsx(ContactAutocomplete, { label: "Related Contact", value: relatedContactId, onChange: setRelatedContactId, placeholder: "Search for a contact (optional)" }), _jsx(DealAutocomplete, { label: "Related Deal", value: relatedDealId, onChange: setRelatedDealId, placeholder: "Search for a deal (optional)" }), _jsxs("div", { className: "flex items-center justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-gray-800", children: [_jsx(Button, { type: "button", variant: "secondary", onClick: () => navigate('/crm/activities'), children: "Cancel" }), _jsxs(Button, { type: "submit", variant: "primary", children: [activityId ? 'Update' : 'Create', " Activity"] })] })] }) }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Activity", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsx("p", { style: { marginBottom: '16px' }, children: "Are you sure you want to delete this activity? This action cannot be undone." }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
 }
 export default ActivityEdit;
 //# sourceMappingURL=ActivityEdit.js.map

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { KanbanView } from '../components/KanbanView';
 
@@ -53,7 +53,8 @@ export function DealList({ onNavigate }: DealListProps) {
 }
 
 function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
-  const { Card, DataTable, Spinner, Modal, Button: UIButton } = useUi();
+  const { Card, DataTable, Spinner, Modal, Button: UIButton, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data, loading, deleteDeal, refetch } = useCrmDeals({});
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -75,7 +76,10 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
       setDeleteConfirm(null);
     } catch (error: any) {
       console.error('Failed to delete deal:', error);
-      alert(error?.message || 'Failed to delete deal');
+      await alertDialog.showAlert(error?.message || 'Failed to delete deal', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -141,6 +145,7 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </>
   );
 }

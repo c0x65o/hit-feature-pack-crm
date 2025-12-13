@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 
 interface ContactListProps {
@@ -10,7 +10,8 @@ interface ContactListProps {
 }
 
 export function ContactList({ onNavigate }: ContactListProps) {
-  const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+  const { Page, Card, Button, DataTable, Spinner, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data, loading, refetch, deleteContact } = useCrmContacts({});
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,7 +33,10 @@ export function ContactList({ onNavigate }: ContactListProps) {
       setDeleteConfirm(null);
     } catch (error: any) {
       console.error('Failed to delete contact:', error);
-      alert(error?.message || 'Failed to delete contact');
+      await alertDialog.showAlert(error?.message || 'Failed to delete contact', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -117,6 +121,7 @@ export function ContactList({ onNavigate }: ContactListProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

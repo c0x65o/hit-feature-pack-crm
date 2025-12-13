@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, RefreshCw } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmActivities } from '../hooks/useCrmActivities';
 
 interface ActivityListProps {
@@ -10,7 +10,8 @@ interface ActivityListProps {
 }
 
 export function ActivityList({ onNavigate }: ActivityListProps) {
-  const { Page, Card, Button, DataTable, Spinner, Modal } = useUi();
+  const { Page, Card, Button, DataTable, Spinner, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data, loading, deleteActivity, refetch } = useCrmActivities({});
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; description: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -32,7 +33,10 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
       setDeleteConfirm(null);
     } catch (error: any) {
       console.error('Failed to delete activity:', error);
-      alert(error?.message || 'Failed to delete activity');
+      await alertDialog.showAlert(error?.message || 'Failed to delete activity', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -117,6 +121,7 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

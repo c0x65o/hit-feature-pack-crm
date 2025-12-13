@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { DealHeader } from '../components/DealHeader';
 import { ActivityLog } from '../components/ActivityLog';
@@ -14,7 +14,8 @@ interface DealDetailProps {
 
 export function DealDetail({ id, onNavigate }: DealDetailProps) {
   const dealId = id === 'new' ? undefined : id;
-  const { Page, Spinner, Alert, Button, Modal } = useUi();
+  const { Page, Spinner, Alert, Button, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data: deal, loading, deleteDeal } = useCrmDeals({ id: dealId });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -47,7 +48,10 @@ export function DealDetail({ id, onNavigate }: DealDetailProps) {
       navigate('/crm/deals');
     } catch (error: any) {
       console.error('Failed to delete deal:', error);
-      alert(error?.message || 'Failed to delete deal');
+      await alertDialog.showAlert(error?.message || 'Failed to delete deal', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -97,6 +101,7 @@ export function DealDetail({ id, onNavigate }: DealDetailProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

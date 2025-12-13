@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { useUi } from '@hit/ui-kit';
+import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { ContactHeader } from '../components/ContactHeader';
@@ -17,7 +17,8 @@ interface ContactDetailProps {
 
 export function ContactDetail({ id, onNavigate }: ContactDetailProps) {
   const contactId = id === 'new' ? undefined : id;
-  const { Page, Spinner, Alert, Card, Button, Modal } = useUi();
+  const { Page, Spinner, Alert, Card, Button, Modal, AlertDialog } = useUi();
+  const alertDialog = useAlertDialog();
   const { data: contact, loading, deleteContact, refetch } = useCrmContacts({ id: contactId });
   const { data: company } = useCrmCompanies({
     id: contact?.companyId,
@@ -41,7 +42,10 @@ export function ContactDetail({ id, onNavigate }: ContactDetailProps) {
       navigate('/crm/contacts');
     } catch (error: any) {
       console.error('Failed to delete contact:', error);
-      alert(error?.message || 'Failed to delete contact');
+      await alertDialog.showAlert(error?.message || 'Failed to delete contact', {
+        variant: 'error',
+        title: 'Delete Failed'
+      });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -185,6 +189,7 @@ export function ContactDetail({ id, onNavigate }: ContactDetailProps) {
           </div>
         </Modal>
       )}
+      <AlertDialog {...alertDialog.props} />
     </Page>
   );
 }

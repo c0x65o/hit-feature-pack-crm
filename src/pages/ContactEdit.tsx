@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUi } from '@hit/ui-kit';
+import { Users, User } from 'lucide-react';
+import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { AddressAutocomplete } from '../components/AddressAutocomplete';

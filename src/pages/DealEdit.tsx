@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUi } from '@hit/ui-kit';
+import { Users, Handshake } from 'lucide-react';
+import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { useCrmPipelineStages } from '../hooks/useCrmPipelineStages';
 import { CurrencyInput, DateInput } from '../components/fields';
@@ -82,8 +83,19 @@ export function DealEdit({ id, onNavigate }: DealEditProps) {
     return <Spinner />;
   }
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'CRM', href: '/crm', icon: <Users size={14} /> },
+    { label: 'Deals', href: '/crm/deals', icon: <Handshake size={14} /> },
+    ...(dealId && deal ? [{ label: deal.dealName, href: `/crm/deals/${dealId}` }] : []),
+    { label: dealId ? 'Edit' : 'New' },
+  ];
+
   return (
-    <Page title={dealId ? 'Edit Deal' : 'New Deal'}>
+    <Page 
+      title={dealId ? 'Edit Deal' : 'New Deal'}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
+    >
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input

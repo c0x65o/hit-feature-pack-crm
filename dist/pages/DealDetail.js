@@ -1,7 +1,7 @@
 'use client';
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useState } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Users, Handshake } from 'lucide-react';
 import { useUi, useAlertDialog } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { DealHeader } from '../components/DealHeader';
@@ -47,7 +47,12 @@ export function DealDetail({ id, onNavigate }) {
             setShowDeleteConfirm(false);
         }
     };
-    return (_jsxs(Page, { title: deal.dealName, actions: _jsxs(_Fragment, { children: [_jsx(Button, { variant: "primary", onClick: () => navigate(`/crm/deals/${dealId}/edit`), children: "Edit Deal" }), _jsxs(Button, { variant: "danger", onClick: () => setShowDeleteConfirm(true), disabled: isDeleting, children: [_jsx(Trash2, { size: 16, className: "mr-2" }), "Delete"] })] }), children: [_jsx(DealHeader, { deal: deal }), _jsx(ActivityLog, { dealId: dealId || '' }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Deal", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deal.dealName, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
+    const breadcrumbs = [
+        { label: 'CRM', href: '/crm', icon: _jsx(Users, { size: 14 }) },
+        { label: 'Deals', href: '/crm/deals', icon: _jsx(Handshake, { size: 14 }) },
+        { label: deal.dealName },
+    ];
+    return (_jsxs(Page, { title: deal.dealName, breadcrumbs: breadcrumbs, onNavigate: navigate, actions: _jsxs(_Fragment, { children: [_jsx(Button, { variant: "primary", onClick: () => navigate(`/crm/deals/${dealId}/edit`), children: "Edit Deal" }), _jsxs(Button, { variant: "danger", onClick: () => setShowDeleteConfirm(true), disabled: isDeleting, children: [_jsx(Trash2, { size: 16, className: "mr-2" }), "Delete"] })] }), children: [_jsx(DealHeader, { deal: deal }), _jsx(ActivityLog, { dealId: dealId || '' }), showDeleteConfirm && (_jsx(Modal, { open: true, onClose: () => setShowDeleteConfirm(false), title: "Delete Deal", children: _jsxs("div", { style: { padding: '16px' }, children: [_jsxs("p", { style: { marginBottom: '16px' }, children: ["Are you sure you want to delete \"", deal.dealName, "\"? This action cannot be undone."] }), _jsxs("div", { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end' }, children: [_jsx(Button, { variant: "secondary", onClick: () => setShowDeleteConfirm(false), children: "Cancel" }), _jsx(Button, { variant: "danger", onClick: handleDelete, disabled: isDeleting, children: isDeleting ? 'Deleting...' : 'Delete' })] })] }) })), _jsx(AlertDialog, { ...alertDialog.props })] }));
 }
 export default DealDetail;
 //# sourceMappingURL=DealDetail.js.map

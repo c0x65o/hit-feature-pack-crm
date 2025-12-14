@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { useUi, useAlertDialog } from '@hit/ui-kit';
+import { Trash2, Users, User } from 'lucide-react';
+import { useUi, useAlertDialog, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { ContactHeader } from '../components/ContactHeader';
@@ -76,9 +76,17 @@ export function ContactDetail({ id, onNavigate }: ContactDetailProps) {
       })
     : null;
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'CRM', href: '/crm', icon: <Users size={14} /> },
+    { label: 'Contacts', href: '/crm/contacts', icon: <User size={14} /> },
+    { label: contact.name },
+  ];
+
   return (
     <Page
       title={contact.name}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
       actions={
         <>
           <Button variant="primary" onClick={() => navigate(`/crm/contacts/${contactId}/edit`)}>

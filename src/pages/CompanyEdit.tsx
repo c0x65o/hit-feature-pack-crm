@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useUi } from '@hit/ui-kit';
+import { Users, Building2 } from 'lucide-react';
+import { useUi, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { AddressAutocomplete } from '../components/AddressAutocomplete';
 import { formatPhoneNumber, normalizePhoneNumber } from '../utils/phone';
@@ -165,8 +166,19 @@ export function CompanyEdit({ id, onNavigate }: CompanyEditProps) {
     return <Spinner />;
   }
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'CRM', href: '/crm', icon: <Users size={14} /> },
+    { label: 'Companies', href: '/crm/companies', icon: <Building2 size={14} /> },
+    ...(companyId && company ? [{ label: company.name, href: `/crm/companies/${companyId}` }] : []),
+    { label: companyId ? 'Edit' : 'New' },
+  ];
+
   return (
-    <Page title={companyId ? 'Edit Company' : 'New Company'}>
+    <Page 
+      title={companyId ? 'Edit Company' : 'New Company'}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
+    >
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           {submitError && (

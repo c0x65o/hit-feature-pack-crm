@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { useUi, useAlertDialog } from '@hit/ui-kit';
+import { Trash2, Users, Building2 } from 'lucide-react';
+import { useUi, useAlertDialog, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmCompanies } from '../hooks/useCrmCompanies';
 import { useCrmContacts } from '../hooks/useCrmContacts';
 import { formatPhoneNumber } from '../utils/phone';
@@ -95,9 +95,17 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
       })
     : company.address || 'N/A';
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'CRM', href: '/crm', icon: <Users size={14} /> },
+    { label: 'Companies', href: '/crm/companies', icon: <Building2 size={14} /> },
+    { label: company.name },
+  ];
+
   return (
     <Page
       title={company.name}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
       actions={
         <>
           <Button variant="primary" onClick={() => navigate(`/crm/companies/${companyId}/edit`)}>

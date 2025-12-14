@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2 } from 'lucide-react';
-import { useUi, useAlertDialog } from '@hit/ui-kit';
+import { Trash2, Users, Handshake } from 'lucide-react';
+import { useUi, useAlertDialog, type BreadcrumbItem } from '@hit/ui-kit';
 import { useCrmDeals } from '../hooks/useCrmDeals';
 import { DealHeader } from '../components/DealHeader';
 import { ActivityLog } from '../components/ActivityLog';
@@ -58,9 +58,17 @@ export function DealDetail({ id, onNavigate }: DealDetailProps) {
     }
   };
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'CRM', href: '/crm', icon: <Users size={14} /> },
+    { label: 'Deals', href: '/crm/deals', icon: <Handshake size={14} /> },
+    { label: deal.dealName },
+  ];
+
   return (
     <Page 
       title={deal.dealName}
+      breadcrumbs={breadcrumbs}
+      onNavigate={navigate}
       actions={
         <>
           <Button variant="primary" onClick={() => navigate(`/crm/deals/${dealId}/edit`)}>

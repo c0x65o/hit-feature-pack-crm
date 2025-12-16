@@ -1,0 +1,1 @@
+{"version":3,"file":"activities.d.ts","sourceRoot":"","sources":["../../../src/server/api/activities.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,YAAY,EAAE,MAAM,aAAa,CAAC;AAOxD,eAAO,MAAM,OAAO,kBAAkB,CAAC;AACvC,eAAO,MAAM,OAAO,WAAW,CAAC;AAEhC;;;GAGG;AACH,wBAAsB,GAAG,CAAC,OAAO,EAAE,WAAW;;;;;;;;;;IAgF7C;AAED;;;GAGG;AACH,wBAAsB,IAAI,CAAC,OAAO,EAAE,WAAW,8BAuC9C"}

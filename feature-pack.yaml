@@ -160,59 +160,101 @@ schema:
     DEFAULT_CRM_PIPELINE_STAGES
   ]
 
-# API routes the feature pack expects
-# Applications should create these routes using the schema (similar to notepad)
-# The feature pack generator may auto-generate simple CRUD routes in the future
+# ─────────────────────────────────────────────────────────────────────────────
+# API ROUTES - Backend endpoints (handler-based pattern - RECOMMENDED)
+# ─────────────────────────────────────────────────────────────────────────────
 api:
   routes:
+    # Contacts
     - path: /api/crm/contacts
       methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/contacts"
       description: "List contacts (GET) or create contact (POST)"
     - path: /api/crm/contacts/[id]
       methods: [GET, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/contacts-id"
       description: "Get, update, or delete a specific contact"
+    # Companies
     - path: /api/crm/companies
       methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/companies"
       description: "List companies (GET) or create company (POST)"
     - path: /api/crm/companies/[id]
       methods: [GET, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/companies-id"
       description: "Get, update, or delete a specific company"
+    # Deals
     - path: /api/crm/deals
       methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/deals"
       description: "List deals (GET) or create deal (POST)"
     - path: /api/crm/deals/[id]
       methods: [GET, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/deals-id"
       description: "Get, update, or delete a specific deal"
     - path: /api/crm/deals/reassign
       methods: [POST]
+      handler: "@hit/feature-pack-crm/server/api/deals-reassign"
       description: "Reassign deals from inactive user to new owner"
+    # Activities
     - path: /api/crm/activities
       methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/activities"
       description: "List activities (GET) or create activity (POST)"
     - path: /api/crm/activities/[id]
       methods: [GET, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/activities-id"
       description: "Get, update, or delete a specific activity"
+    # Personal Notes
     - path: /api/crm/personal-notes
       methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/personal-notes"
       description: "List personal notes (GET) or create note (POST), scoped by user"
+    # Reports
     - path: /api/crm/reports/close-rate
       methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/reports-close-rate"
       description: "Get close rate KPI"
     - path: /api/crm/reports/acv
       methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/reports-acv"
       description: "Get average contract value (ACV) KPI"
     - path: /api/crm/reports/sales-cycle
       methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/reports-sales-cycle"
       description: "Get average sales cycle length KPI"
     - path: /api/crm/reports/pipeline-health
       methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/reports-pipeline-health"
       description: "Get pipeline health by stage"
+    # Data Export
     - path: /api/crm/data-export
       methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/data-export"
       description: "Bulk data export (requires API key authentication)"
+    # Webhooks
     - path: /api/crm/webhooks
       methods: [GET, POST, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/webhooks"
       description: "Manage webhook configurations"
+    # Pipeline Stages
+    - path: /api/crm/pipeline-stages
+      methods: [GET, POST]
+      handler: "@hit/feature-pack-crm/server/api/pipeline-stages"
+      description: "List pipeline stages (GET) or create stage (POST)"
+    - path: /api/crm/pipeline-stages/[id]
+      methods: [GET, PUT, DELETE]
+      handler: "@hit/feature-pack-crm/server/api/pipeline-stages-id"
+      description: "Get, update, or delete a specific pipeline stage"
+    - path: /api/crm/pipeline-stages/reorder
+      methods: [PUT]
+      handler: "@hit/feature-pack-crm/server/api/pipeline-stages-reorder"
+      description: "Reorder pipeline stages"
+    # Metrics
+    - path: /api/crm/metrics
+      methods: [GET]
+      handler: "@hit/feature-pack-crm/server/api/metrics"
+      description: "Get CRM metrics and dashboard data"
 
 # No module dependencies - runs on project's own database
 requires:

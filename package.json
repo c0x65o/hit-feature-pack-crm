@@ -1,6 +1,6 @@
 {
   "name": "@hit/feature-pack-crm",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "CRM feature pack with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export. Uses @hit/ui-kit for shell-agnostic UI.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,6 +17,12 @@
       "import": "./dist/schema/crm.js",
       "require": "./dist/schema/crm.js",
       "default": "./dist/schema/crm.js"
+    },
+    "./server/api/*": {
+      "types": "./dist/server/api/*.d.ts",
+      "import": "./dist/server/api/*.js",
+      "require": "./dist/server/api/*.js",
+      "default": "./dist/server/api/*.js"
     }
   },
   "files": [

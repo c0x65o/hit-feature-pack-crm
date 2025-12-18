@@ -2,7 +2,6 @@
 # CRM module with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export
 
 name: crm
-version: 1.0.0
 description: CRM feature pack with contacts, companies, deals, activities, LLM integration, RBAC, webhooks, and data export
 
 # Route definitions - mapped to React components

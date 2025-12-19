@@ -96,6 +96,9 @@ export function CompanyList({ onNavigate }: CompanyListProps) {
             onRowClick={(row) => {
               navigate(`/crm/companies/${String(row.id)}`);
             }}
+            onRefresh={refetch}
+            refreshing={loading}
+            tableId="crm.companies"
           />
         )}
       </Card>

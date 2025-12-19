@@ -96,6 +96,9 @@ export function ContactList({ onNavigate }: ContactListProps) {
             onRowClick={(row) => {
               navigate(`/crm/contacts/${String(row.id)}`);
             }}
+            onRefresh={refetch}
+            refreshing={loading}
+            tableId="crm.contacts"
           />
         )}
       </Card>

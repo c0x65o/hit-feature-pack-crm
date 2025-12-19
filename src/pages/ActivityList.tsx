@@ -95,7 +95,11 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
               },
             ]}
             data={data || []}
+            loading={loading}
             onRowClick={(row) => navigate(`/crm/activities/${String(row.id)}`)}
+            onRefresh={refetch}
+            refreshing={loading}
+            tableId="crm.activities"
           />
         )}
       </Card>

@@ -119,7 +119,11 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
               },
             ]}
             data={data?.items || []}
+            loading={loading}
             onRowClick={(row) => navigate(`/crm/deals/${String(row.id)}`)}
+            onRefresh={refetch}
+            refreshing={loading}
+            tableId="crm.deals"
           />
         )}
       </Card>

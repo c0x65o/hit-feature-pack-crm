@@ -65,7 +65,7 @@ routes:
 nav:
   - id: crm
     label: CRM
-    path: /crm
+    path: /dashboards?pack=crm
     icon: Users
     group: main  # Primary business features
     showWhen: authenticated
@@ -73,7 +73,7 @@ nav:
     children:
       - id: crm-dashboard
         label: Dashboard
-        path: /crm
+        path: /dashboards?pack=crm
         icon: LayoutDashboard
         weight: 100
         showWhen: authenticated

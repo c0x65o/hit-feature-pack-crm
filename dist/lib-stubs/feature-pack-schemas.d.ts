@@ -7,5 +7,5 @@
  *
  * This stub re-exports from the local schema file for type checking.
  */
-export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, type CrmContact, type CrmCompany, type CrmDeal, type CrmActivity, type CrmPersonalNote, type CrmPipelineStage, type CrmWebhookConfig, type CrmApiKey, type CrmOpenaiKey, type InsertCrmContact, type InsertCrmCompany, type InsertCrmDeal, type InsertCrmActivity, type InsertCrmPersonalNote, type InsertCrmPipelineStage, type InsertCrmWebhookConfig, type InsertCrmApiKey, type InsertCrmOpenaiKey, DEFAULT_CRM_PIPELINE_STAGES, } from '../schema/crm';
+export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPipelineStages, type CrmContact, type CrmCompany, type CrmDeal, type CrmActivity, type CrmPipelineStage, type InsertCrmContact, type InsertCrmCompany, type InsertCrmDeal, type InsertCrmActivity, type InsertCrmPipelineStage, DEFAULT_CRM_PIPELINE_STAGES, } from '../schema/crm';
 //# sourceMappingURL=feature-pack-schemas.d.ts.map

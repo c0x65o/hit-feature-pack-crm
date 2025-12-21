@@ -8,5 +8,5 @@
  * This stub re-exports from the local schema file for type checking.
  */
 // Re-export from the actual schema file for type checking during build
-export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPersonalNotes, crmPipelineStages, crmWebhookConfigs, crmApiKeys, crmOpenaiKeys, DEFAULT_CRM_PIPELINE_STAGES, } from '../schema/crm';
+export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPipelineStages, DEFAULT_CRM_PIPELINE_STAGES, } from '../schema/crm';
 //# sourceMappingURL=feature-pack-schemas.js.map

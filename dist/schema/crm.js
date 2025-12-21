@@ -148,86 +148,6 @@ export const crmActivities = pgTable("crm_activities", {
     taskDueIdx: index("crm_activities_task_due_idx").on(table.taskDueDate),
     createdByIdx: index("crm_activities_created_by_idx").on(table.createdByUserId),
 }));
-/**
- * CRM Personal Notes Table
- * User-scoped notes for contacts (child object of CRM_Contact)
- * Retrieval scoped exclusively to user_id matching authenticated user
- */
-export const crmPersonalNotes = pgTable("crm_personal_notes", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    contactId: uuid("contact_id").references(() => crmContacts.id, { onDelete: "cascade" }).notNull(),
-    userId: varchar("user_id", { length: 255 }).notNull(), // Note creator FK to user
-    noteText: text("note_text").notNull(), // Rich text
-    // Audit fields
-    createdByUserId: varchar("created_by_user_id", { length: 255 }).notNull(),
-    createdOnTimestamp: timestamp("created_on_timestamp").defaultNow().notNull(),
-    lastUpdatedByUserId: varchar("last_updated_by_user_id", { length: 255 }),
-    lastUpdatedOnTimestamp: timestamp("last_updated_on_timestamp").defaultNow().notNull(),
-}, (table) => ({
-    contactIdx: index("crm_personal_notes_contact_idx").on(table.contactId),
-    userIdx: index("crm_personal_notes_user_idx").on(table.userId),
-    contactUserIdx: index("crm_personal_notes_contact_user_idx").on(table.contactId, table.userId),
-}));
-/**
- * CRM Webhook Configs Table
- * Per-customer webhook configuration
- */
-export const crmWebhookConfigs = pgTable("crm_webhook_configs", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    customerId: varchar("customer_id", { length: 255 }), // Optional: for multi-tenant support
-    webhookUrl: varchar("webhook_url", { length: 500 }).notNull(),
-    isEnabled: boolean("is_enabled").notNull().default(true),
-    events: jsonb("events").notNull(), // Array of event types to trigger on
-    secret: varchar("secret", { length: 255 }), // Optional webhook secret for signature verification
-    // Audit fields
-    createdByUserId: varchar("created_by_user_id", { length: 255 }).notNull(),
-    createdOnTimestamp: timestamp("created_on_timestamp").defaultNow().notNull(),
-    lastUpdatedByUserId: varchar("last_updated_by_user_id", { length: 255 }),
-    lastUpdatedOnTimestamp: timestamp("last_updated_on_timestamp").defaultNow().notNull(),
-}, (table) => ({
-    customerIdx: index("crm_webhook_configs_customer_idx").on(table.customerId),
-}));
-/**
- * CRM API Keys Table
- * API keys for data export authentication (per customer/user)
- */
-export const crmApiKeys = pgTable("crm_api_keys", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    keyHash: varchar("key_hash", { length: 255 }).notNull(), // Hashed API key
-    customerId: varchar("customer_id", { length: 255 }), // Optional: for multi-tenant support
-    userId: varchar("user_id", { length: 255 }), // Optional: per-user API keys
-    name: varchar("name", { length: 255 }), // Human-readable name for the key
-    isActive: boolean("is_active").notNull().default(true),
-    lastUsedAt: timestamp("last_used_at"),
-    expiresAt: timestamp("expires_at"), // Optional expiration
-    // Audit fields
-    createdByUserId: varchar("created_by_user_id", { length: 255 }).notNull(),
-    createdOnTimestamp: timestamp("created_on_timestamp").defaultNow().notNull(),
-    lastUpdatedByUserId: varchar("last_updated_by_user_id", { length: 255 }),
-    lastUpdatedOnTimestamp: timestamp("last_updated_on_timestamp").defaultNow().notNull(),
-}, (table) => ({
-    keyHashIdx: unique("crm_api_keys_hash_unique").on(table.keyHash),
-    customerIdx: index("crm_api_keys_customer_idx").on(table.customerId),
-    userIdx: index("crm_api_keys_user_idx").on(table.userId),
-}));
-/**
- * CRM OpenAI Keys Table
- * Per-customer OpenAI API keys for LLM integration
- */
-export const crmOpenaiKeys = pgTable("crm_openai_keys", {
-    id: uuid("id").primaryKey().defaultRandom(),
-    customerId: varchar("customer_id", { length: 255 }), // Optional: for multi-tenant support
-    keyEncrypted: text("key_encrypted").notNull(), // Encrypted OpenAI API key
-    isActive: boolean("is_active").notNull().default(true),
-    lastUsedAt: timestamp("last_used_at"),
-    // Audit fields
-    createdByUserId: varchar("created_by_user_id", { length: 255 }).notNull(),
-    createdOnTimestamp: timestamp("created_on_timestamp").defaultNow().notNull(),
-    lastUpdatedByUserId: varchar("last_updated_by_user_id", { length: 255 }),
-    lastUpdatedOnTimestamp: timestamp("last_updated_on_timestamp").defaultNow().notNull(),
-}, (table) => ({
-    customerIdx: index("crm_openai_keys_customer_idx").on(table.customerId),
-}));
 // Relations for Drizzle ORM
 export const crmCompaniesRelations = relations(crmCompanies, ({ many }) => ({
     contacts: many(crmContacts),
@@ -240,7 +160,6 @@ export const crmContactsRelations = relations(crmContacts, ({ one, many }) => ({
     }),
     deals: many(crmDeals),
     activities: many(crmActivities),
-    personalNotes: many(crmPersonalNotes),
 }));
 export const crmDealsRelations = relations(crmDeals, ({ one, many }) => ({
     company: one(crmCompanies, {
@@ -265,12 +184,6 @@ export const crmActivitiesRelations = relations(crmActivities, ({ one }) => ({
     relatedDeal: one(crmDeals, {
         fields: [crmActivities.relatedDealId],
         references: [crmDeals.id],
-    }),
-}));
-export const crmPersonalNotesRelations = relations(crmPersonalNotes, ({ one }) => ({
-    contact: one(crmContacts, {
-        fields: [crmPersonalNotes.contactId],
-        references: [crmContacts.id],
     }),
 }));
 export const crmPipelineStagesRelations = relations(crmPipelineStages, ({ many }) => ({

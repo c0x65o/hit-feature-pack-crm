@@ -238,12 +238,12 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
                   sortable: false,
                   hideable: false,
                   align: 'right',
-                  render: (_value, row) => (
+                  render: (_value: unknown, row: Record<string, unknown>) => (
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
                           setDeleteContactConfirm({ id: String(row.id), name: String(row.name) });
                         }}
@@ -262,7 +262,7 @@ export function CompanyDetail({ id, onNavigate }: CompanyDetailProps) {
                   : 'N/A',
               }))}
               loading={contactsLoading}
-              onRowClick={(row) => {
+              onRowClick={(row: Record<string, unknown>) => {
                 navigate(`/crm/contacts/${String(row.id)}`);
               }}
             />

@@ -75,12 +75,12 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
                 sortable: false,
                 hideable: false,
                 align: 'right',
-                render: (_value, row) => (
+                render: (_value: unknown, row: Record<string, unknown>) => (
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         setDeleteConfirm({ 
                           id: String(row.id), 
@@ -96,7 +96,7 @@ export function ActivityList({ onNavigate }: ActivityListProps) {
             ]}
             data={data || []}
             loading={loading}
-            onRowClick={(row) => navigate(`/crm/activities/${String(row.id)}`)}
+            onRowClick={(row: Record<string, unknown>) => navigate(`/crm/activities/${String(row.id)}`)}
             onRefresh={refetch}
             refreshing={loading}
             tableId="crm.activities"

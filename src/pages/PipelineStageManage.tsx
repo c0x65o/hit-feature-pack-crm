@@ -310,7 +310,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
             <Input
               label="Stage Code"
               value={formData.code}
-              onChange={(value) => setFormData({ ...formData, code: normalizeStageCode(value) })}
+              onChange={(value: string) => setFormData({ ...formData, code: normalizeStageCode(value) })}
               placeholder="e.g. qualified, closed_won"
               required={!editingStage}
               disabled={Boolean(editingStage)}
@@ -323,7 +323,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
             <Input
               label="Stage Name"
               value={formData.name}
-              onChange={(value) => setFormData({ ...formData, name: value })}
+              onChange={(value: string) => setFormData({ ...formData, name: value })}
               required
             />
             
@@ -332,7 +332,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
                 label="Order"
                 type="number"
                 value={formData.order.toString()}
-                onChange={(value) => setFormData({ ...formData, order: parseInt(value) || 1 })}
+                onChange={(value: string) => setFormData({ ...formData, order: parseInt(value) || 1 })}
                 required
               />
               <div>
@@ -368,14 +368,14 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
                 label="Probability (%)"
                 type="number"
                 value={formData.probability?.toString() || ''}
-                onChange={(value) => setFormData({ ...formData, probability: value ? parseInt(value) : null })}
+                onChange={(value: string) => setFormData({ ...formData, probability: value ? parseInt(value) : null })}
                 placeholder="0-100"
               />
               <Select
                 label="Forecast Category"
                 options={forecastCategories}
                 value={formData.forecastCategory}
-                onChange={(value) => setFormData({ ...formData, forecastCategory: value })}
+                onChange={(value: string | number) => setFormData({ ...formData, forecastCategory: String(value) })}
               />
             </div>
 
@@ -383,7 +383,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
               label="WIP Limit (optional)"
               type="number"
               value={formData.wipLimit?.toString() || ''}
-              onChange={(value) => setFormData({ ...formData, wipLimit: value ? parseInt(value) : null })}
+              onChange={(value: string) => setFormData({ ...formData, wipLimit: value ? parseInt(value) : null })}
               placeholder="Maximum deals in this stage"
             />
 
@@ -391,7 +391,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
               <Checkbox
                 label="Closed Won"
                 checked={formData.isClosedWon}
-                onChange={(checked) => {
+                onChange={(checked: boolean) => {
                   setFormData({ 
                     ...formData, 
                     isClosedWon: checked,
@@ -402,7 +402,7 @@ export function PipelineStageManage({ onNavigate: _onNavigate }: { onNavigate?: 
               <Checkbox
                 label="Closed Lost"
                 checked={formData.isClosedLost}
-                onChange={(checked) => {
+                onChange={(checked: boolean) => {
                   setFormData({ 
                     ...formData, 
                     isClosedLost: checked,

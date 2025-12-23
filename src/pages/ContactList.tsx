@@ -75,12 +75,12 @@ export function ContactList({ onNavigate }: ContactListProps) {
                 sortable: false,
                 hideable: false,
                 align: 'right',
-                render: (_value, row) => (
+                render: (_value: unknown, row: Record<string, unknown>) => (
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         setDeleteConfirm({ id: String(row.id), name: String(row.name) });
                       }}
@@ -93,7 +93,7 @@ export function ContactList({ onNavigate }: ContactListProps) {
             ]}
             data={data?.items || []}
             loading={loading}
-            onRowClick={(row) => {
+            onRowClick={(row: Record<string, unknown>) => {
               navigate(`/crm/contacts/${String(row.id)}`);
             }}
             onRefresh={refetch}

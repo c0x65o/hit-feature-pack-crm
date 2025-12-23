@@ -10,7 +10,31 @@ export { Dashboard, DashboardPage, ContactList, ContactListPage, ContactDetail, 
 export * from './components/index';
 export * from './hooks/index';
 export { navContributions as nav } from './nav';
-export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPipelineStages, type CrmContact, type CrmCompany, type CrmDeal, type CrmActivity, type CrmPipelineStage, type InsertCrmContact, type InsertCrmCompany, type InsertCrmDeal, type InsertCrmActivity, type InsertCrmPipelineStage, DEFAULT_CRM_PIPELINE_STAGES, } from './schema/crm';
+export declare const DEFAULT_CRM_PIPELINE_STAGES: readonly [{
+    readonly name: "Lead";
+    readonly order: 0;
+    readonly color: "#6366f1";
+}, {
+    readonly name: "Qualified";
+    readonly order: 1;
+    readonly color: "#8b5cf6";
+}, {
+    readonly name: "Proposal";
+    readonly order: 2;
+    readonly color: "#ec4899";
+}, {
+    readonly name: "Negotiation";
+    readonly order: 3;
+    readonly color: "#f59e0b";
+}, {
+    readonly name: "Closed Won";
+    readonly order: 4;
+    readonly color: "#10b981";
+}, {
+    readonly name: "Closed Lost";
+    readonly order: 5;
+    readonly color: "#ef4444";
+}];
 export { parseActivityText } from './services/openai';
 export * from './services/rbac';
 //# sourceMappingURL=index.d.ts.map

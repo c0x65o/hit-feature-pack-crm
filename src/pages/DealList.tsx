@@ -42,7 +42,7 @@ export function DealList({ onNavigate }: DealListProps) {
     >
       <Tabs
         activeTab={view}
-        onChange={(tabId) => setView(tabId as 'list' | 'kanban')}
+        onChange={(tabId: string) => setView(tabId as 'list' | 'kanban')}
         tabs={[
           { id: 'kanban', label: 'Kanban', content: <KanbanView /> },
           { id: 'list', label: 'List', content: <DealListView onNavigate={onNavigate} /> },
@@ -102,12 +102,12 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
                 sortable: false,
                 hideable: false,
                 align: 'right',
-                render: (_value, row) => (
+                render: (_value: unknown, row: Record<string, unknown>) => (
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <UIButton
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         setDeleteConfirm({ id: String(row.id), name: String(row.dealName) });
                       }}
@@ -120,7 +120,7 @@ function DealListView({ onNavigate }: { onNavigate?: (path: string) => void }) {
             ]}
             data={data?.items || []}
             loading={loading}
-            onRowClick={(row) => navigate(`/crm/deals/${String(row.id)}`)}
+            onRowClick={(row: Record<string, unknown>) => navigate(`/crm/deals/${String(row.id)}`)}
             onRefresh={refetch}
             refreshing={loading}
             tableId="crm.deals"

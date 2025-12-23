@@ -14,8 +14,17 @@ export * from './components/index';
 export * from './hooks/index';
 // Navigation config
 export { navContributions as nav } from './nav';
-// Schema exports - for projects to import into their schema
-export { crmContacts, crmCompanies, crmDeals, crmActivities, crmPipelineStages, DEFAULT_CRM_PIPELINE_STAGES, } from './schema/crm';
+// Schema exports - MOVED to @hit/feature-pack-crm/schema to avoid bundling drizzle-orm in client
+// Don't import from schema file at all - it pulls in drizzle-orm
+// Default pipeline stages - defined inline to avoid pulling in schema file
+export const DEFAULT_CRM_PIPELINE_STAGES = [
+    { name: 'Lead', order: 0, color: '#6366f1' },
+    { name: 'Qualified', order: 1, color: '#8b5cf6' },
+    { name: 'Proposal', order: 2, color: '#ec4899' },
+    { name: 'Negotiation', order: 3, color: '#f59e0b' },
+    { name: 'Closed Won', order: 4, color: '#10b981' },
+    { name: 'Closed Lost', order: 5, color: '#ef4444' },
+];
 // Services
 export { parseActivityText } from './services/openai';
 export * from './services/rbac';

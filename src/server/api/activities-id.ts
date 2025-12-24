@@ -8,11 +8,16 @@ import { getUserId } from '../auth';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+function isUuid(v: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+}
+
 function extractId(request: NextRequest): string | null {
   const url = new URL(request.url);
   const parts = url.pathname.split('/');
   // /api/crm/activities/{id} -> id is last part
-  return parts[parts.length - 1] || null;
+  const raw = parts[parts.length - 1] || null;
+  return raw ? decodeURIComponent(raw) : null;
 }
 
 /**
@@ -23,6 +28,12 @@ export async function GET(request: NextRequest) {
     const id = extractId(request);
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    }
+    if (!isUuid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid id. Activity id must be a UUID. Use GET /api/crm/activities?search=... to find the id.' },
+        { status: 400 }
+      );
     }
 
     const db = getDb();
@@ -59,15 +70,27 @@ export async function PUT(request: NextRequest) {
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 });
     }
+    if (!isUuid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid id. Activity id must be a UUID. Use GET /api/crm/activities?search=... to find the id.' },
+        { status: 400 }
+      );
+    }
 
     const body = await request.json();
     const db = getDb();
 
     const updateData: any = {
-      ...body,
+      rawNoteText: body?.rawNoteText ?? undefined,
+      relatedContactId: body?.relatedContactId ?? undefined,
+      relatedDealId: body?.relatedDealId ?? undefined,
+      activityType: body?.activityType ?? undefined,
+      taskDueDate: body?.taskDueDate ?? undefined,
+      taskDescription: body?.taskDescription ?? undefined,
       lastUpdatedByUserId: userId,
       lastUpdatedOnTimestamp: new Date(),
     };
+    for (const k of Object.keys(updateData)) if (updateData[k] === undefined) delete updateData[k];
 
     if (body.taskDueDate) {
       updateData.taskDueDate = new Date(body.taskDueDate);
@@ -101,6 +124,12 @@ export async function DELETE(request: NextRequest) {
     const id = extractId(request);
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    }
+    if (!isUuid(id)) {
+      return NextResponse.json(
+        { error: 'Invalid id. Activity id must be a UUID.' },
+        { status: 400 }
+      );
     }
 
     const db = getDb();

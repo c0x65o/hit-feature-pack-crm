@@ -6,11 +6,15 @@ import { eq } from 'drizzle-orm';
 import { getUserId } from '../auth';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+function isUuid(v) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+}
 function extractId(request) {
     const url = new URL(request.url);
     const parts = url.pathname.split('/');
     // /api/crm/companies/{id} -> id is last part
-    return parts[parts.length - 1] || null;
+    const raw = parts[parts.length - 1] || null;
+    return raw ? decodeURIComponent(raw) : null;
 }
 /**
  * GET /api/crm/companies/[id]
@@ -20,6 +24,9 @@ export async function GET(request) {
         const id = extractId(request);
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+        }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Company id must be a UUID. Use GET /api/crm/companies?search=... to find the id.' }, { status: 400 });
         }
         const db = getDb();
         const [company] = await db
@@ -49,12 +56,35 @@ export async function PUT(request) {
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
         }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Company id must be a UUID. Use GET /api/crm/companies?search=... to find the id.' }, { status: 400 });
+        }
         const body = await request.json();
         const db = getDb();
+        // Whitelist fields to prevent accidental updates to system/audit fields.
+        const patch = {
+            name: body?.name ?? undefined,
+            address1: body?.address1 ?? undefined,
+            address2: body?.address2 ?? undefined,
+            city: body?.city ?? undefined,
+            state: body?.state ?? undefined,
+            postalCode: body?.postalCode ?? undefined,
+            country: body?.country ?? undefined,
+            address: body?.address ?? undefined,
+            website: body?.website ?? undefined,
+            companyPhone: body?.companyPhone ?? undefined,
+            companyEmail: body?.companyEmail ?? undefined,
+            numEmployees: body?.numEmployees ?? undefined,
+            estimatedRevenue: body?.estimatedRevenue ?? undefined,
+        };
+        // Remove undefined keys so drizzle doesn't overwrite with null.
+        for (const k of Object.keys(patch))
+            if (patch[k] === undefined)
+                delete patch[k];
         const [company] = await db
             .update(crmCompanies)
             .set({
-            ...body,
+            ...patch,
             lastUpdatedByUserId: userId,
             lastUpdatedOnTimestamp: new Date(),
         })
@@ -78,6 +108,9 @@ export async function DELETE(request) {
         const id = extractId(request);
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+        }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Company id must be a UUID.' }, { status: 400 });
         }
         const db = getDb();
         const [company] = await db

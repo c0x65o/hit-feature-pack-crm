@@ -89,6 +89,10 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/crm/companies
  * Create a new company
+ *
+ * Notes:
+ * - `name` is unique. If a company already exists with the same name, this endpoint
+ *   returns the existing company instead of failing (idempotent-ish behavior helps AI flows).
  */
 export async function POST(request: NextRequest) {
   try {
@@ -96,7 +100,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    if (!body.name) {
+    const name = String(body?.name || '').trim();
+    if (!name) {
       return NextResponse.json(
         { error: 'Name is required' },
         { status: 400 }
@@ -109,8 +114,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const result = await db.insert(crmCompanies).values({
-      name: body.name as string,
+    try {
+      const result = await db.insert(crmCompanies).values({
+      name,
       address1: body.address1 || null,
       address2: body.address2 || null,
       city: body.city || null,
@@ -125,9 +131,19 @@ export async function POST(request: NextRequest) {
       estimatedRevenue: body.estimatedRevenue || null,
       createdByUserId: userId,
       lastUpdatedByUserId: userId,
-    }).returning();
+      }).returning();
 
-    return NextResponse.json(result[0], { status: 201 });
+      return NextResponse.json(result[0], { status: 201 });
+    } catch (e: any) {
+      // Unique constraint violation -> return existing record (better than 500 for agentic flows)
+      if (String(e?.code || '') === '23505') {
+        const [existing] = await db.select().from(crmCompanies).where(eq(crmCompanies.name, name)).limit(1);
+        if (existing) {
+          return NextResponse.json({ ...existing, alreadyExists: true }, { status: 200 });
+        }
+      }
+      throw e;
+    }
   } catch (error) {
     console.error('[crm] Create company error:', error);
     return NextResponse.json(

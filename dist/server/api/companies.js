@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
 import { crmCompanies } from '@/lib/feature-pack-schemas';
-import { desc, asc, like, sql, and, or } from 'drizzle-orm';
+import { eq, desc, asc, like, sql, and, or } from 'drizzle-orm';
 import { getUserId } from '../auth';
 // Required for Next.js App Router
 export const dynamic = 'force-dynamic';
@@ -69,13 +69,18 @@ export async function GET(request) {
 /**
  * POST /api/crm/companies
  * Create a new company
+ *
+ * Notes:
+ * - `name` is unique. If a company already exists with the same name, this endpoint
+ *   returns the existing company instead of failing (idempotent-ish behavior helps AI flows).
  */
 export async function POST(request) {
     try {
         const db = getDb();
         const body = await request.json();
         // Validate required fields
-        if (!body.name) {
+        const name = String(body?.name || '').trim();
+        if (!name) {
             return NextResponse.json({ error: 'Name is required' }, { status: 400 });
         }
         // Get user ID for audit fields
@@ -83,24 +88,36 @@ export async function POST(request) {
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-        const result = await db.insert(crmCompanies).values({
-            name: body.name,
-            address1: body.address1 || null,
-            address2: body.address2 || null,
-            city: body.city || null,
-            state: body.state || null,
-            postalCode: body.postalCode || null,
-            country: body.country || null,
-            address: body.address || null,
-            website: body.website || null,
-            companyPhone: body.companyPhone || null,
-            companyEmail: body.companyEmail || null,
-            numEmployees: body.numEmployees || null,
-            estimatedRevenue: body.estimatedRevenue || null,
-            createdByUserId: userId,
-            lastUpdatedByUserId: userId,
-        }).returning();
-        return NextResponse.json(result[0], { status: 201 });
+        try {
+            const result = await db.insert(crmCompanies).values({
+                name,
+                address1: body.address1 || null,
+                address2: body.address2 || null,
+                city: body.city || null,
+                state: body.state || null,
+                postalCode: body.postalCode || null,
+                country: body.country || null,
+                address: body.address || null,
+                website: body.website || null,
+                companyPhone: body.companyPhone || null,
+                companyEmail: body.companyEmail || null,
+                numEmployees: body.numEmployees || null,
+                estimatedRevenue: body.estimatedRevenue || null,
+                createdByUserId: userId,
+                lastUpdatedByUserId: userId,
+            }).returning();
+            return NextResponse.json(result[0], { status: 201 });
+        }
+        catch (e) {
+            // Unique constraint violation -> return existing record (better than 500 for agentic flows)
+            if (String(e?.code || '') === '23505') {
+                const [existing] = await db.select().from(crmCompanies).where(eq(crmCompanies.name, name)).limit(1);
+                if (existing) {
+                    return NextResponse.json({ ...existing, alreadyExists: true }, { status: 200 });
+                }
+            }
+            throw e;
+        }
     }
     catch (error) {
         console.error('[crm] Create company error:', error);

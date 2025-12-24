@@ -19,6 +19,10 @@ export declare function GET(request: NextRequest): Promise<NextResponse<{
 /**
  * POST /api/crm/companies
  * Create a new company
+ *
+ * Notes:
+ * - `name` is unique. If a company already exists with the same name, this endpoint
+ *   returns the existing company instead of failing (idempotent-ish behavior helps AI flows).
  */
 export declare function POST(request: NextRequest): Promise<NextResponse<any>>;
 //# sourceMappingURL=companies.d.ts.map

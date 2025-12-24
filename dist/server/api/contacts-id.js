@@ -6,11 +6,15 @@ import { eq } from 'drizzle-orm';
 import { getUserId } from '../auth';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+function isUuid(v) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+}
 function extractId(request) {
     const url = new URL(request.url);
     const parts = url.pathname.split('/');
     // /api/crm/contacts/{id} -> id is last part
-    return parts[parts.length - 1] || null;
+    const raw = parts[parts.length - 1] || null;
+    return raw ? decodeURIComponent(raw) : null;
 }
 /**
  * GET /api/crm/contacts/[id]
@@ -20,6 +24,9 @@ export async function GET(request) {
         const id = extractId(request);
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+        }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Contact id must be a UUID. Use GET /api/crm/contacts?search=... to find the id.' }, { status: 400 });
         }
         const db = getDb();
         const [contact] = await db
@@ -49,12 +56,29 @@ export async function PUT(request) {
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
         }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Contact id must be a UUID. Use GET /api/crm/contacts?search=... to find the id.' }, { status: 400 });
+        }
         const body = await request.json();
         const db = getDb();
+        // Whitelist common editable fields. (Avoid overwriting system/audit fields.)
+        const patch = {
+            firstName: body?.firstName ?? undefined,
+            lastName: body?.lastName ?? undefined,
+            name: body?.name ?? undefined,
+            email: body?.email ?? undefined,
+            phone: body?.phone ?? undefined,
+            title: body?.title ?? undefined,
+            companyId: body?.companyId ?? undefined,
+            notes: body?.notes ?? undefined,
+        };
+        for (const k of Object.keys(patch))
+            if (patch[k] === undefined)
+                delete patch[k];
         const [contact] = await db
             .update(crmContacts)
             .set({
-            ...body,
+            ...patch,
             lastUpdatedByUserId: userId,
             lastUpdatedOnTimestamp: new Date(),
         })
@@ -78,6 +102,9 @@ export async function DELETE(request) {
         const id = extractId(request);
         if (!id) {
             return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+        }
+        if (!isUuid(id)) {
+            return NextResponse.json({ error: 'Invalid id. Contact id must be a UUID.' }, { status: 400 });
         }
         const db = getDb();
         const [contact] = await db
